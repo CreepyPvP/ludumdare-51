@@ -67,9 +67,9 @@ clean:
 
 
 # Web output target
-$(DIST_OUT)/index.html: code/main.cpp $(OUTPUT)/libraylib.a shell.html
+$(DIST_OUT)/index.html: code/main.cpp $(OUTPUT)/libraylib.a shell.html assets
 	@mkdir -p $(@D)
-	$(CC) code/main.cpp $(OUTPUT)/libraylib.a -o $(DIST_OUT)/index.html $(COMPILER_OPTS) -I code -s USE_GLFW=3 -s ASYNCIFY --shell-file shell.html
+	$(CC) code/main.cpp $(OUTPUT)/libraylib.a -o $(DIST_OUT)/index.html $(COMPILER_OPTS) -I code -s USE_GLFW=3 -s ASYNCIFY --shell-file shell.html --preload-file assets
 
 $(DIST_OUT)/game.exe: code/main.cpp $(OUTPUT)/libraylib.a
 	@mkdir -p $(@D)

@@ -1,6 +1,8 @@
-TODO:
+npx http-server -o ./
 
-File loading
+
+
+TODO:
 
 Audio
 AA
