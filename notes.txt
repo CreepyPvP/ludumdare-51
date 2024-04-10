@@ -1,13 +1,10 @@
-make PLATFORM=PLATFORM_DESKTOP RAYLIB_RELEASE_PATH=../
-W:\ludumdare>gcc code/main.cpp ./libraylib.a -lgdi32 -lopengl32 -lwinmm -I raylib    
-
-
 TODO:
+
+File loading
 
 Audio
 AA
 
-File loading
 Entity system
 Json parser
 Testing

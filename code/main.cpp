@@ -1,34 +1,15 @@
-/*******************************************************************************************
-*
-*   raylib [core] example - 3d camera first person
-*
-*   Example originally created with raylib 1.3, last time updated with raylib 1.3
-*
-*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
-*   BSD-like license that allows static linking with closed source software
-*
-*   Copyright (c) 2015-2024 Ramon Santamaria (@raysan5)
-*
-********************************************************************************************/
-
 #include "raylib.h"
 #include "rcamera.h"
 
 #define MAX_COLUMNS 20
 
-//------------------------------------------------------------------------------------
-// Program main entry point
-//------------------------------------------------------------------------------------
 int main(void)
 {
-    // Initialization
-    //--------------------------------------------------------------------------------------
     const int screenWidth = 800;
     const int screenHeight = 450;
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - 3d camera first person");
 
-    // Define the camera to look into our 3d world (position, target, up vector)
     Camera camera = { 0 };
     camera.position = (Vector3){ 0.0f, 2.0f, 4.0f };    // Camera position
     camera.target = (Vector3){ 0.0f, 2.0f, 0.0f };      // Camera looking at point
@@ -38,7 +19,6 @@ int main(void)
 
     int cameraMode = CAMERA_FIRST_PERSON;
 
-    // Generates some random columns
     float heights[MAX_COLUMNS] = { 0 };
     Vector3 positions[MAX_COLUMNS] = { 0 };
     Color colors[MAX_COLUMNS] = { 0 };
@@ -53,7 +33,6 @@ int main(void)
     DisableCursor();                    // Limit cursor to relative movement inside the window
 
     SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
 
     // Main game loop
     while (!WindowShouldClose())        // Detect window close button or ESC key
