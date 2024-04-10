@@ -4,5 +4,5 @@ build
 *.exe
 *.wasm
 *.js
-*.html
 *.zip
+index.html

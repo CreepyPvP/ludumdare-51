@@ -4,7 +4,6 @@ W:\ludumdare>gcc code/main.cpp ./libraylib.a -lgdi32 -lopengl32 -lwinmm -I rayli
 
 TODO:
 
-Compile for windows
 Audio
 AA
 
