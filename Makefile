@@ -1,4 +1,4 @@
-.PHONY: clean
+.PHONY: clean upload
 
 index.html: code/main.cpp libraylib_wasm.a shell.html
 	emcc -o ./index.html code/main.cpp -Os -Wall ./libraylib_wasm.a -I code -I raylib -L. -s USE_GLFW=3 -s ASYNCIFY --shell-file shell.html -DPLATFORM_WEB
