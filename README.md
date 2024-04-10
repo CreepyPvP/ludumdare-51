@@ -1,6 +1,10 @@
+# Engine for Ludum Dare 55
 
-BEFORE:
-emsdk_env.bat
+## Prerequisites
+
+- https://github.com/skeeto/w64devkit
+- https://github.com/emscripten-core/emscripten
+  - _Might require calling:_ `emsdk_env.bat`
 
 ## Makefile instructions
 
@@ -20,3 +24,7 @@ make upload: Upload project via butler CLI. See section below
 
 make clean: Cleans up the project
 ```
+
+## Publish to Itch.io via Butler
+
+Needs to be installed for publishing. See https://itch.io/docs/butler/
