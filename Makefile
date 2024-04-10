@@ -1,11 +1,7 @@
-game.exe: libraylib.a
-	gcc code/main.cpp ./libraylib.a -lgdi32 -lopengl32 -lwinmm -I raylib    
+.PHONY: clean
 
 index.html: code/main.cpp libraylib_wasm.a shell.html
 	emcc -o ./index.html code/main.cpp -Os -Wall ./libraylib_wasm.a -I code -I raylib -L. -s USE_GLFW=3 -s ASYNCIFY --shell-file shell.html -DPLATFORM_WEB
-
-libraylib.a: raylib/rcore.o raylib/rshapes.o raylib/rtextures.o raylib/rtext.o raylib/rmodels.o raylib/utils.o raylib/raudio.o
-	cd raylib; make PLATFORM=PLATFORM_DESKTOP RAYLIB_RELEASE_PATH=../
 
 # Object files are used to for the wasm build
 rcore.o: raylib/rcore.c
@@ -32,11 +28,15 @@ raudio.o: raylib/raudio.c
 libraylib_wasm.a: rcore.o rshapes.o rtextures.o rtext.o rmodels.o utils.o raudio.o
 	emar rcs libraylib_wasm.a rcore.o rshapes.o rtextures.o rtext.o rmodels.o utils.o raudio.o
 
-libraylib.a: 
-
 upload: release_wasm.zip
 	butler push release_wasm.zip gerolmed/internal-test-project:web
 
 release_wasm.zip: index.html index.js index.wasm
 	tar.exe -a -c -f release_wasm.zip index.html index.js index.wasm
 
+clean:
+	rm -f ./*.o
+	rm -f ./*.a
+	rm -f ./*.exe
+	rm -f ./index.*
+	cd raylib; make clean RAYLIB_RELEASE_PATH=../
