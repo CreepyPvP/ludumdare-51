@@ -7,7 +7,10 @@ RAYLIB := raylib/rcore raylib/rshapes raylib/rtextures raylib/rtext raylib/rmode
 PLATFORM ?= WEB
 
 ifeq ($(PLATFORM),WEB)
+
+ifndef SILENT
 $(info Building for web...)
+endif
 CC := emcc
 AR := emar
 COMPILER_OPTS := -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
@@ -45,8 +48,9 @@ ifdef DESKTOP
 build: $(DIST_OUT)/game.exe
 endif
 build:
+ifndef SILENT
 	$(info Distributions omitted to '$(DIST_OUT)')
-
+endif
 
 prepare_zip: $(DIST_OUT)/release.zip
 
