@@ -1,42 +1,91 @@
-.PHONY: clean upload
+.PHONY: clean upload prepare_zip build
 
-index.html: code/main.cpp libraylib_wasm.a shell.html
-	emcc -o ./index.html code/main.cpp -Os -Wall ./libraylib_wasm.a -I code -I raylib -L. -s USE_GLFW=3 -s ASYNCIFY --shell-file shell.html -DPLATFORM_WEB
+RAYLIB := raylib/rcore raylib/rshapes raylib/rtextures raylib/rtext raylib/rmodels raylib/utils raylib/raudio
+#####################################################################
+## PLATFORM DEFINITION
+#####################################################################
+PLATFORM ?= WEB
 
-# Object files are used to for the wasm build
-rcore.o: raylib/rcore.c
-	emcc -o rcore.o -c raylib/rcore.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
+ifeq ($(PLATFORM),WEB)
+$(info Building for web...)
+CC := emcc
+AR := emar
+COMPILER_OPTS := -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
+PLAT_ID := web
+WEB := 1
+else ifeq ($(PLATFORM),WIN)
+$(info Building for windows...)
+CC := gcc
+AR := ar
+PLAT_ID := win
+COMPILER_OPTS := -lopengl32 -lgdi32 -lwinmm -lraylib -L./output/$(PLAT_ID)/ -I raylib -D_GNU_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -I raylib/external/glfw/include
+DESKTOP := 1
+RAYLIB += raylib/rglfw
 
-rshapes.o: raylib/rshapes.c
-	emcc -o rshapes.o -c raylib/rshapes.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
+else
+$(error Bad PLATFORM specified '$(PLATFORM)'. Supported Targets: WEB, WIN)
+endif
 
-rtextures.o: raylib/rtextures.c
-	emcc -o rtextures.o -c raylib/rtextures.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
+#####################################################################
+## Common VARIABLES
+#####################################################################
 
-rtext.o: raylib/rtext.c
-	emcc -o rtext.o -c raylib/rtext.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
+OUTPUT := output/$(PLAT_ID)
+DIST_OUT := $(OUTPUT)/dist
+RAYLIB_OBJS := $(foreach item,$(RAYLIB),$(OUTPUT)/$(item).o)
 
-rmodels.o: raylib/rmodels.c
-	emcc -o rmodels.o -c raylib/rmodels.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
 
-utils.o: raylib/utils.c
-	emcc -o utils.o -c raylib/utils.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
+#####################################################################
+## Primary Targets
+#####################################################################
+ifdef WEB
+build: $(DIST_OUT)/index.html
+endif
+ifdef DESKTOP
+build: $(DIST_OUT)/game.exe
+endif
+build:
+	$(info Distributions omitted to '$(DIST_OUT)')
 
-raudio.o: raylib/raudio.c
-	emcc -o raudio.o -c raylib/raudio.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
 
-libraylib_wasm.a: rcore.o rshapes.o rtextures.o rtext.o rmodels.o utils.o raudio.o
-	emar rcs libraylib_wasm.a rcore.o rshapes.o rtextures.o rtext.o rmodels.o utils.o raudio.o
+prepare_zip: $(DIST_OUT)/release.zip
 
-upload: release_wasm.zip
-	butler push release_wasm.zip gerolmed/internal-test-project:web
-
-release_wasm.zip: index.html index.js index.wasm
-	tar.exe -a -c -f release_wasm.zip index.html index.js index.wasm
+upload: $(DIST_OUT)/release.zip
+	butler push $(DIST_OUT)/release.zip gerolmed/internal-test-project:$(PLAT_ID)
 
 clean:
-	rm -f ./*.o
-	rm -f ./*.a
-	rm -f ./*.exe
-	rm -f ./index.*
+	rm -rf output
 	cd raylib; make clean RAYLIB_RELEASE_PATH=../
+
+#####################################################################
+## Secondary Targets
+#####################################################################
+
+
+# Web output target
+$(DIST_OUT)/index.html: code/main.cpp $(OUTPUT)/libraylib.a shell.html
+	@mkdir -p $(@D)
+	$(CC) code/main.cpp $(OUTPUT)/libraylib.a -o $(DIST_OUT)/index.html $(COMPILER_OPTS) -I code -s USE_GLFW=3 -s ASYNCIFY --shell-file shell.html
+
+$(DIST_OUT)/game.exe: code/main.cpp $(OUTPUT)/libraylib.a
+	@mkdir -p $(@D)
+	$(CC) code/main.cpp $(OUTPUT)/libraylib.a -o $(DIST_OUT)/game.exe -lopengl32 -lgdi32 -lwinmm -lraylib -L./output/$(PLAT_ID)/ -I raylib -I code
+
+$(OUTPUT)/%.o : %.c
+	@mkdir -p $(@D)
+	$(CC) -c $^ -o $@ $(COMPILER_OPTS)
+
+$(OUTPUT)/libraylib.a: $(RAYLIB_OBJS)
+	@mkdir -p $(@D)
+	$(AR) rcs $@ $(RAYLIB_OBJS)
+
+
+ifdef WEB
+RELEASE_CONTENT := $(DIST_OUT)/release.zip $(DIST_OUT)/index.html $(DIST_OUT)/index.js $(DIST_OUT)/index.wasm
+endif
+ifdef DESKTOP
+RELEASE_CONTENT := $(DIST_OUT)/game.exe
+endif
+$(DIST_OUT)/release.zip: $(RELEASE_CONTENT)
+	@mkdir -p $(@D)
+	tar.exe -a -c -f $(DIST_OUT)/release.zip $(RELEASE_CONTENT)
