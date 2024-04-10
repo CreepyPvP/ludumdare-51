@@ -6,3 +6,6 @@ build
 *.js
 *.zip
 index.html
+
+.idea
+*.iml
