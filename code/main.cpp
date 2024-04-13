@@ -51,7 +51,7 @@ i32 main(void)
     SetTargetFPS(60);
 
     // i32 size;
-    // u8* file = LoadFileData("assets/test.txt", &size);
+    // u8 *file = LoadFileData("assets/test.txt", &size);
     // printf("Got string: %s\n", file);
     // UnloadFileData(file);
 
@@ -66,7 +66,9 @@ i32 main(void)
 
         root->Update();
 
-        DrawRectangle(100, 100, 50, 50, BLUE);
+        DrawRectangle(100, 100, 200, 200, BLUE);
+        DrawRectangle(300, 100, 200, 200, GREEN);
+        DrawRectangle(500, 100, 200, 200, RED);
 
         EndShaderMode();
         EndDrawing();

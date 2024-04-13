@@ -7,6 +7,9 @@ out vec4 out_Color;
 
 void main() 
 {
-    out_Color = vec4(uv, 0, 1);
-    // out_Color = vec4(color, 1);
+    // NOTE: From 1 to 0
+    float d = length(2 * uv - vec2(1));
+
+    float thickness = 0.07;
+    out_Color = vec4(max(thickness * color / d - thickness * color, vec3(0)), 1);
 }
