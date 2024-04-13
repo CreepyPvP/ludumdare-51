@@ -110,6 +110,23 @@ struct Entity
         }
     }
 
+    virtual void Render()
+    {
+        rlPushMatrix();
+        rlTranslatef(local_position.x, local_position.y, local_position.z);
+        rlRotatef(local_rotation.x,1, 0,0);
+        rlRotatef(local_rotation.y,0, 1,0);
+        rlRotatef(local_rotation.z,0, 0,1);
+        rlScalef(local_scale.x, local_scale.y, local_scale.z);
+        Entity *next_target = *child;
+        while (next_target) {
+            next_target->Update();
+            next_target = *next_target->next;
+        }
+
+        rlPopMatrix();
+    }
+
     virtual void OnDisable()
     {
         flags = flags & ~EntityStateFlag::ACTIVE;

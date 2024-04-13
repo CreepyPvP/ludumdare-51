@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include "rlgl.h"
 #include "raymath.h"
 #include "utils.h"
 
@@ -62,11 +63,12 @@ i32 main(void)
     Shader neon_shader = LoadShader("assets/neon.vert", "assets/neon.frag");
 
     while (!WindowShouldClose()) {
-        ClearBackground(BLACK);
-
-        BeginDrawing();
-        BeginShaderMode(neon_shader);
         root->Update();
+        ClearBackground(BLACK);
+        BeginDrawing();
+
+        root->Render();
+        BeginShaderMode(neon_shader);
 
         DrawRectangle(100, 100, 50, 50, BLUE);
 
