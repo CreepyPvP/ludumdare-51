@@ -1,4 +1,6 @@
 #include "raylib.h"
+#include "raymath.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <assert.h>
@@ -22,6 +24,7 @@ typedef double f64;
 
 #include "arena.cpp"
 #include "entity.cpp"
+#include "game_entity.cpp"
 
 i32 main(void)
 {
@@ -31,11 +34,12 @@ i32 main(void)
     i32 screen_height = 450;
 
     Entity *root = allocate_entity<Entity>();
-    Entity *childA = allocate_entity<Entity>();
+    TestEntity *childA = allocate_entity<TestEntity>();
     Entity *childB = allocate_entity<Entity>();
 
     root->PushChild(childB);
-    root->PushChild(childA);
+    childB->local_position = {5,0};
+    childB->PushChild(childA);
 
     u64 memory_size = Kilobytes(10);
     void *memory = malloc(memory_size);
@@ -57,13 +61,11 @@ i32 main(void)
 
     Shader neon_shader = LoadShader("assets/neon.vert", "assets/neon.frag");
 
-    while (!WindowShouldClose())
-    {
+    while (!WindowShouldClose()) {
         ClearBackground(BLACK);
 
         BeginDrawing();
         BeginShaderMode(neon_shader);
-
         root->Update();
 
         DrawRectangle(100, 100, 50, 50, BLUE);
