@@ -1,10 +1,10 @@
-.PHONY: clean upload prepare_zip build
+.PHONY: clean upload prepare_zip build all
 
 RAYLIB := raylib/rcore raylib/rshapes raylib/rtextures raylib/rtext raylib/rmodels raylib/utils raylib/raudio
 #####################################################################
 ## PLATFORM DEFINITION
 #####################################################################
-PLATFORM ?= WEB
+PLATFORM ?= WIN
 
 ifeq ($(PLATFORM),WEB)
 
@@ -51,6 +51,8 @@ build:
 ifndef SILENT
 	$(info Distributions omitted to '$(DIST_OUT)')
 endif
+
+all: build
 
 prepare_zip: $(DIST_OUT)/release.zip
 
