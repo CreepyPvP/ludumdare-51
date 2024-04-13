@@ -17,7 +17,9 @@ COMPILER_OPTS := -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
 PLAT_ID := web
 WEB := 1
 else ifeq ($(PLATFORM),WIN)
+ifndef SILENT
 $(info Building for windows...)
+endif
 CC := gcc
 AR := ar
 PLAT_ID := win
@@ -34,7 +36,7 @@ endif
 #####################################################################
 
 OUTPUT := output/$(PLAT_ID)
-DIST_OUT := $(OUTPUT)/dist
+DIST_OUT := .
 RAYLIB_OBJS := $(foreach item,$(RAYLIB),$(OUTPUT)/$(item).o)
 
 

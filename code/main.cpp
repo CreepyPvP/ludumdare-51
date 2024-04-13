@@ -24,16 +24,20 @@ typedef double f64;
 
 i32 main(void)
 {
-    i32 screenWidth = 800;
-    i32 screenHeight = 450;
+    SetTraceLogLevel(LOG_DEBUG);   
+
+    i32 screen_width = 800;
+    i32 screen_height = 450;
 
     u64 memory_size = Kilobytes(10);
     void *memory = malloc(memory_size);
     Arena arena;
     init_arena(&arena, memory, memory_size);
 
-    InitWindow(screenWidth, screenHeight, "Game title goes here");
+    InitWindow(screen_width, screen_height, "Title...");
     InitAudioDevice();
+
+    SetShapesTexture({}, {});
 
     DisableCursor();
     SetTargetFPS(60);
@@ -42,11 +46,20 @@ i32 main(void)
     // u8* file = LoadFileData("assets/test.txt", &size);
     // printf("Got string: %s\n", file);
     // UnloadFileData(file);
+    
+    Shader neon_shader = LoadShader("assets/neon.vert", "assets/neon.frag");
 
     while (!WindowShouldClose())
     {
+        ClearBackground(BLACK);
+
+
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        BeginShaderMode(neon_shader);
+
+        DrawRectangle(100, 100, 50, 50, BLUE);
+
+        EndShaderMode();
         EndDrawing();
     }
 
