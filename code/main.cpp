@@ -21,9 +21,19 @@ typedef float f32;
 typedef double f64;
 
 #include "arena.cpp"
+#include "entity.cpp"
 
 i32 main(void)
 {
+
+
+    Entity* root = allocate_entity<Entity>();
+    Entity* childA = allocate_entity<Entity>();
+    Entity* childB = allocate_entity<Entity>();
+
+    root->PushChild(childB);
+    root->PushChild(childA);
+
     i32 screenWidth = 800;
     i32 screenHeight = 450;
 
@@ -47,9 +57,11 @@ i32 main(void)
     {
         BeginDrawing();
         ClearBackground(RAYWHITE);
+        root->Update();
         EndDrawing();
     }
 
+    root->OnDestroy();
     CloseAudioDevice();
     CloseWindow();
 
