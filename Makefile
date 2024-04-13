@@ -1,10 +1,16 @@
-.PHONY: clean upload prepare_zip build all
 
 RAYLIB := raylib/rcore raylib/rshapes raylib/rtextures raylib/rtext raylib/rmodels raylib/utils raylib/raudio
 #####################################################################
 ## PLATFORM DEFINITION
 #####################################################################
 PLATFORM ?= WIN
+
+ifndef PROD
+ifndef SILENT
+$(info DEBUG MODE)
+endif
+endif
+
 
 ifeq ($(PLATFORM),WEB)
 
@@ -14,6 +20,7 @@ endif
 CC := emcc
 AR := emar
 COMPILER_OPTS := -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
+COMPILER_OPTS_RAYLIB := $(COMPILER_OPTS)
 PLAT_ID := web
 WEB := 1
 else ifeq ($(PLATFORM),WIN)
@@ -23,7 +30,13 @@ endif
 CC := gcc
 AR := ar
 PLAT_ID := win
-COMPILER_OPTS := -lopengl32 -lstdc++ -lgdi32 -lwinmm -lraylib -L./output/$(PLAT_ID)/ -I raylib -D_GNU_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -I raylib/external/glfw/include
+
+ifndef PROD
+COMPILER_OPTS := -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib -g -O0
+else
+COMPILER_OPTS := -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib
+endif
+COMPILER_OPTS_RAYLIB := $(COMPILER_OPTS) -D_GNU_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -I raylib/external/glfw/include
 DESKTOP := 1
 RAYLIB += raylib/rglfw
 
@@ -40,6 +53,7 @@ DIST_OUT := .
 RAYLIB_OBJS := $(foreach item,$(RAYLIB),$(OUTPUT)/$(item).o)
 
 
+.PHONY: clean upload prepare_zip build all $(DIST_OUT)/game.exe
 #####################################################################
 ## Primary Targets
 #####################################################################
@@ -73,15 +87,15 @@ clean:
 # Web output target
 $(DIST_OUT)/index.html: code/main.cpp $(OUTPUT)/libraylib.a shell.html assets
 	@mkdir -p $(@D)
-	$(CC) code/main.cpp $(OUTPUT)/libraylib.a -o $(DIST_OUT)/index.html $(COMPILER_OPTS) -I code -s USE_GLFW=3 -s ASYNCIFY --shell-file shell.html --preload-file assets
+	$(CC) code/main.cpp $(OUTPUT)/libraylib.a -o $(DIST_OUT)/index.html $(COMPILER_OPTS) -I code -L./output/$(PLAT_ID)/ -s USE_GLFW=3 -s ASYNCIFY --shell-file shell.html --preload-file assets
 
 $(DIST_OUT)/game.exe: code/main.cpp $(OUTPUT)/libraylib.a
 	@mkdir -p $(@D)
-	$(CC) code/main.cpp $(OUTPUT)/libraylib.a -o $(DIST_OUT)/game.exe -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -L./output/$(PLAT_ID)/ -I raylib -I code
+	$(CC) code/main.cpp $(OUTPUT)/libraylib.a -o $(DIST_OUT)/game.exe $(COMPILER_OPTS) -I code -L./output/$(PLAT_ID)/
 
 $(OUTPUT)/%.o : %.c
 	@mkdir -p $(@D)
-	$(CC) -c $^ -o $@ $(COMPILER_OPTS)
+	$(CC) -c $^ -o $@ $(COMPILER_OPTS_RAYLIB)
 
 $(OUTPUT)/libraylib.a: $(RAYLIB_OBJS)
 	@mkdir -p $(@D)

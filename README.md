@@ -11,8 +11,9 @@
 ```
 FLAGS:
 
-PLATFORM=WIN or WEB //DEFAULT: WEB
-SILENT //if set hide verbose output
+PLATFORM=WIN or WEB // DEFAULT: WEB
+SILENT // if set hide verbose output
+PROD  // if set creates optimized build
 
 INSTRUCTIONS:
 make:

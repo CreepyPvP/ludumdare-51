@@ -1,3 +1,4 @@
+
 enum EntityStateFlag
 {
     ACTIVE = 1 << 0,
@@ -45,6 +46,10 @@ struct Entity
 
     Entity() = default;
 
+    Vector3 local_position{};
+    Vector3 local_rotation{};
+    Vector3 local_scale{1,1,1};
+
     u32 id = 0;
 
     u32 flags = 0;
@@ -53,8 +58,38 @@ struct Entity
     EntityRef<Entity> child{};
     EntityRef<Entity> next{};
 
+    Vector3 GetWorldPosition() {
+        if (!*parent) {
+            return local_position;
+        }
+        return Vector3Transform(local_position, parent->GetWorldTransform());
+    }
 
-    virtual void OnCreate() {};
+    Matrix GetLocalTransform() const
+    {
+
+        return MatrixMultiply(
+                MatrixTranslate(local_position.x, local_position.y, local_position.z),
+                MatrixMultiply(
+                        MatrixRotateXYZ(local_rotation),
+                        MatrixScale(local_scale.x, local_scale.y, local_scale.z)
+                )
+        );
+    }
+
+    Matrix GetWorldTransform()
+    {
+        if (!*parent) {
+            return GetLocalTransform();
+        }
+        return MatrixMultiply(parent->GetWorldTransform(), GetLocalTransform());
+    }
+
+
+    virtual void OnCreate()
+    {
+
+    };
 
     virtual void OnEnable()
     {
@@ -73,6 +108,23 @@ struct Entity
             next_target->Update();
             next_target = *next_target->next;
         }
+    }
+
+    virtual void Render()
+    {
+        rlPushMatrix();
+        rlTranslatef(local_position.x, local_position.y, local_position.z);
+        rlRotatef(local_rotation.x,1, 0,0);
+        rlRotatef(local_rotation.y,0, 1,0);
+        rlRotatef(local_rotation.z,0, 0,1);
+        rlScalef(local_scale.x, local_scale.y, local_scale.z);
+        Entity *next_target = *child;
+        while (next_target) {
+            next_target->Update();
+            next_target = *next_target->next;
+        }
+
+        rlPopMatrix();
     }
 
     virtual void OnDisable()
