@@ -21,13 +21,21 @@ typedef float f32;
 typedef double f64;
 
 #include "arena.cpp"
+#include "entity.cpp"
 
 i32 main(void)
 {
-    SetTraceLogLevel(LOG_DEBUG);   
+    SetTraceLogLevel(LOG_DEBUG);
 
     i32 screen_width = 800;
     i32 screen_height = 450;
+
+    Entity* root = allocate_entity<Entity>();
+    Entity* childA = allocate_entity<Entity>();
+    Entity* childB = allocate_entity<Entity>();
+
+    root->PushChild(childB);
+    root->PushChild(childA);
 
     u64 memory_size = Kilobytes(10);
     void *memory = malloc(memory_size);
@@ -46,16 +54,17 @@ i32 main(void)
     // u8* file = LoadFileData("assets/test.txt", &size);
     // printf("Got string: %s\n", file);
     // UnloadFileData(file);
-    
+
     Shader neon_shader = LoadShader("assets/neon.vert", "assets/neon.frag");
 
     while (!WindowShouldClose())
     {
         ClearBackground(BLACK);
 
-
         BeginDrawing();
         BeginShaderMode(neon_shader);
+
+        root->Update();
 
         DrawRectangle(100, 100, 50, 50, BLUE);
 
@@ -63,6 +72,7 @@ i32 main(void)
         EndDrawing();
     }
 
+    root->OnDestroy();
     CloseAudioDevice();
     CloseWindow();
 

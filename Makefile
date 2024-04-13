@@ -1,10 +1,10 @@
-.PHONY: clean upload prepare_zip build
+.PHONY: clean upload prepare_zip build all
 
 RAYLIB := raylib/rcore raylib/rshapes raylib/rtextures raylib/rtext raylib/rmodels raylib/utils raylib/raudio
 #####################################################################
 ## PLATFORM DEFINITION
 #####################################################################
-PLATFORM ?= WEB
+PLATFORM ?= WIN
 
 ifeq ($(PLATFORM),WEB)
 
@@ -23,7 +23,7 @@ endif
 CC := gcc
 AR := ar
 PLAT_ID := win
-COMPILER_OPTS := -lopengl32 -lgdi32 -lwinmm -lraylib -L./output/$(PLAT_ID)/ -I raylib -D_GNU_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -I raylib/external/glfw/include
+COMPILER_OPTS := -lopengl32 -lstdc++ -lgdi32 -lwinmm -lraylib -L./output/$(PLAT_ID)/ -I raylib -D_GNU_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -I raylib/external/glfw/include
 DESKTOP := 1
 RAYLIB += raylib/rglfw
 
@@ -54,6 +54,8 @@ ifndef SILENT
 	$(info Distributions omitted to '$(DIST_OUT)')
 endif
 
+all: build
+
 prepare_zip: $(DIST_OUT)/release.zip
 
 upload: $(DIST_OUT)/release.zip
@@ -75,7 +77,7 @@ $(DIST_OUT)/index.html: code/main.cpp $(OUTPUT)/libraylib.a shell.html assets
 
 $(DIST_OUT)/game.exe: code/main.cpp $(OUTPUT)/libraylib.a
 	@mkdir -p $(@D)
-	$(CC) code/main.cpp $(OUTPUT)/libraylib.a -o $(DIST_OUT)/game.exe -lopengl32 -lgdi32 -lwinmm -lraylib -L./output/$(PLAT_ID)/ -I raylib -I code
+	$(CC) code/main.cpp $(OUTPUT)/libraylib.a -o $(DIST_OUT)/game.exe -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -L./output/$(PLAT_ID)/ -I raylib -I code
 
 $(OUTPUT)/%.o : %.c
 	@mkdir -p $(@D)
