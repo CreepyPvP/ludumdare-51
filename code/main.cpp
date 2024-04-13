@@ -30,9 +30,9 @@ i32 main(void)
     i32 screen_width = 800;
     i32 screen_height = 450;
 
-    Entity* root = allocate_entity<Entity>();
-    Entity* childA = allocate_entity<Entity>();
-    Entity* childB = allocate_entity<Entity>();
+    Entity *root = allocate_entity<Entity>();
+    Entity *childA = allocate_entity<Entity>();
+    Entity *childB = allocate_entity<Entity>();
 
     root->PushChild(childB);
     root->PushChild(childA);
