@@ -37,6 +37,8 @@ T* AllocateEntity(GameState *state)
 
     T *entity = new ((void*) (state->entity_slots + id)) T;
 
+    *entity = {};
+    entity->local_scale = { 1, 1, 1 };
     entity->id = id;
     entity->generation = state->entity_generations[id];
 
@@ -53,21 +55,20 @@ EntityRef<T> make_ref(Entity *target)
 
 struct Entity
 {
+    u32 id;
+    u32 generation;
+    u32 flags;
 
-    Vector3 local_position{};
-    Vector3 local_rotation{};
-    Vector3 local_scale{1,1,1};
+    Vector3 local_position;
+    Vector3 local_rotation;
+    Vector3 local_scale;
 
-    u32 id = 0;
-    u32 generation = 0;
+    EntityRef<Entity> parent;
+    EntityRef<Entity> child;
+    EntityRef<Entity> next;
 
-    u32 flags = 0;
-
-    EntityRef<Entity> parent{};
-    EntityRef<Entity> child{};
-    EntityRef<Entity> next{};
-
-    Vector3 GetWorldPosition() {
+    Vector3 GetWorldPosition()
+    {
         if (!*parent) {
             return local_position;
         }
