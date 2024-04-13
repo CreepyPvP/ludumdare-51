@@ -7,6 +7,8 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
+#include <new>
 
 #define Kilobytes(size) (1024 * size)
 #define Megabytes(size) (1024 * Kilobytes(size))
@@ -23,9 +25,47 @@ typedef int64_t i64;
 typedef float f32;
 typedef double f64;
 
-#include "arena.cpp"
+#include "arena.h"
+
+struct EntitySlot
+{
+    char buffer[128];
+};
+
+struct GameState
+{
+    Arena arena;
+
+    u32 entity_cap;
+    EntitySlot *entity_slots;
+    u32 *entity_generations;
+    u32 free_entity_count;
+    u32 *free_entities;
+};
+
 #include "entity.cpp"
 #include "game_entity.cpp"
+#include "arena.cpp"
+
+static GameState *create_game_state(void *memory, u64 memory_size)
+{
+    GameState pre = {};
+    InitArena(&pre.arena, memory, memory_size);
+
+    GameState *state = PushStruct(&pre.arena, GameState);
+    *state = pre;
+
+    state->entity_cap = 100;
+    state->entity_slots = PushArray(&state->arena, EntitySlot, state->entity_cap);
+    state->entity_generations = PushZeroArray(&state->arena, u32, state->entity_cap);
+    state->free_entity_count = state->entity_cap;
+    state->free_entities = PushArray(&state->arena, u32, state->entity_cap);
+    for (u32 i = 0; i < state->entity_cap; ++i) {
+        state->free_entities[i] = i;
+    }
+
+    return state;
+}
 
 i32 main(void)
 {
@@ -34,18 +74,19 @@ i32 main(void)
     i32 screen_width = 800;
     i32 screen_height = 450;
 
-    Entity *root = allocate_entity<Entity>();
-    TestEntity *childA = allocate_entity<TestEntity>();
-    Entity *childB = allocate_entity<Entity>();
-
-    root->PushChild(childB);
-    childB->local_position = {0, 0};
-    childB->PushChild(childA);
-
-    u64 memory_size = Kilobytes(10);
+    u64 memory_size = Megabytes(1);
     void *memory = malloc(memory_size);
-    Arena arena;
-    init_arena(&arena, memory, memory_size);
+
+    GameState *state = create_game_state(memory, memory_size);
+
+    Entity *root = AllocateEntity<Entity>(state);
+    TestEntity *child_a = AllocateEntity<TestEntity>(state);
+    Entity *child_b = AllocateEntity<Entity>(state);
+
+    root->PushChild(child_b);
+    child_b->local_position = {0, 0};
+    child_b->PushChild(child_a);
+
 
     InitWindow(screen_width, screen_height, "Title...");
     InitAudioDevice();
@@ -77,9 +118,9 @@ i32 main(void)
         BeginShaderMode(neon_shader);
 
         root->Render();
-        DrawRectangle(100, 200, 100, 100, BLUE);
-        DrawRectangle(300, 200, 100, 100, GREEN);
-        DrawRectangle(500, 200, 100, 100, RED);
+        DrawRectangle(150, 170, 100, 100, BLUE);
+        DrawRectangle(350, 170, 100, 100, GREEN);
+        DrawRectangle(550, 170, 100, 100, RED);
 
         // DrawRectangle(100, 200, 200, 200, {255, 0, 0, 255});
         // DrawRectangle(300, 200, 200, 200, {0, 255, 0, 255});

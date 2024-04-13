@@ -23,13 +23,23 @@ struct EntityRef
     T *ref;
 };
 
-u32 counter = 0;
-
 template<typename T>
-T *allocate_entity()
+T* AllocateEntity(GameState *state)
 {
-    T *entity = new T();
-    entity->id = ++counter;
+    if (sizeof(T) >= sizeof(EntitySlot)) {
+        TRACELOG(LOG_ERROR, "Entity size [%u] exceeds block size [%u]\n", sizeof(T), sizeof(EntitySlot));
+        assert(0);
+
+    }
+
+    u32 id = state->free_entities[state->free_entity_count];
+    state->free_entity_count--;
+
+    T *entity = new ((void*) (state->entity_slots + id)) T;
+
+    entity->id = id;
+    entity->generation = state->entity_generations[id];
+
     return entity;
 }
 
@@ -37,20 +47,19 @@ template<typename T>
 EntityRef<T> make_ref(Entity *target)
 {
     return {
-            (T *) target
+        (T *) target
     };
 };
 
 struct Entity
 {
 
-    Entity() = default;
-
     Vector3 local_position{};
     Vector3 local_rotation{};
     Vector3 local_scale{1,1,1};
 
     u32 id = 0;
+    u32 generation = 0;
 
     u32 flags = 0;
 
@@ -69,11 +78,11 @@ struct Entity
     {
 
         return MatrixMultiply(
-                MatrixTranslate(local_position.x, local_position.y, local_position.z),
-                MatrixMultiply(
-                        MatrixRotateXYZ(local_rotation),
-                        MatrixScale(local_scale.x, local_scale.y, local_scale.z)
-                )
+            MatrixTranslate(local_position.x, local_position.y, local_position.z),
+            MatrixMultiply(
+                MatrixRotateXYZ(local_rotation),
+                MatrixScale(local_scale.x, local_scale.y, local_scale.z)
+            )
         );
     }
 
