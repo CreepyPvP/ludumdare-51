@@ -8,6 +8,5 @@ struct TestEntity: Entity {
     }
     void Render() override {
         Entity::Render();
-
     }
 };

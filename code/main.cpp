@@ -39,7 +39,7 @@ i32 main(void)
     Entity *childB = allocate_entity<Entity>();
 
     root->PushChild(childB);
-    childB->local_position = {5,0};
+    childB->local_position = {0, 0};
     childB->PushChild(childA);
 
     u64 memory_size = Kilobytes(10);
@@ -62,17 +62,28 @@ i32 main(void)
 
     Shader neon_shader = LoadShader("assets/neon.vert", "assets/neon.frag");
 
+    i32 seconds_loc = GetShaderLocation(neon_shader, "seconds");
+
+    f32 seconds = 0;
+
     while (!WindowShouldClose()) {
+        seconds += GetFrameTime();
+        SetShaderValue(neon_shader, seconds_loc, &seconds, SHADER_UNIFORM_FLOAT);
+
         root->Update();
         ClearBackground(BLACK);
         BeginDrawing();
 
-        root->Render();
         BeginShaderMode(neon_shader);
 
-        DrawRectangle(100, 100, 200, 200, BLUE);
-        DrawRectangle(300, 100, 200, 200, GREEN);
-        DrawRectangle(500, 100, 200, 200, RED);
+        root->Render();
+        DrawRectangle(100, 200, 100, 100, BLUE);
+        DrawRectangle(300, 200, 100, 100, GREEN);
+        DrawRectangle(500, 200, 100, 100, RED);
+
+        // DrawRectangle(100, 200, 200, 200, {255, 0, 0, 255});
+        // DrawRectangle(300, 200, 200, 200, {0, 255, 0, 255});
+        // DrawRectangle(500, 200, 200, 200, {0, 0, 255, 255});
 
         EndShaderMode();
         EndDrawing();

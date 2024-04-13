@@ -1,12 +1,6 @@
 npx http-server -o ./
 
-
-
 TODO:
 
-Audio
-AA
-
-Entity system
-Json parser
-Testing
+Wave effect
+Bloom
