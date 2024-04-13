@@ -120,7 +120,7 @@ struct Entity
         rlScalef(local_scale.x, local_scale.y, local_scale.z);
         Entity *next_target = *child;
         while (next_target) {
-            next_target->Update();
+            next_target->Render();
             next_target = *next_target->next;
         }
 
