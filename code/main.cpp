@@ -27,10 +27,7 @@ typedef double f64;
 
 #include "arena.h"
 
-struct EntitySlot
-{
-    char buffer[128];
-};
+union EntitySlot;
 
 struct GameState
 {
@@ -46,6 +43,12 @@ struct GameState
 #include "entity.cpp"
 #include "game_entity.cpp"
 #include "arena.cpp"
+
+union EntitySlot
+{
+    Entity base;
+    TestEntity test;
+};
 
 static GameState *create_game_state(void *memory, u64 memory_size)
 {

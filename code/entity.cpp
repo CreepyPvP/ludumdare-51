@@ -26,19 +26,11 @@ struct EntityRef
 template<typename T>
 T* AllocateEntity(GameState *state)
 {
-    if (sizeof(T) >= sizeof(EntitySlot)) {
-        TRACELOG(LOG_ERROR, "Entity size [%u] exceeds block size [%u]\n", sizeof(T), sizeof(EntitySlot));
-        assert(0);
-
-    }
-
     u32 id = state->free_entities[state->free_entity_count];
     state->free_entity_count--;
 
     T *entity = new ((void*) (state->entity_slots + id)) T;
 
-    *entity = {};
-    entity->local_scale = { 1, 1, 1 };
     entity->id = id;
     entity->generation = state->entity_generations[id];
 
@@ -61,7 +53,7 @@ struct Entity
 
     Vector3 local_position;
     Vector3 local_rotation;
-    Vector3 local_scale;
+    Vector3 local_scale = {1, 1, 1};
 
     EntityRef<Entity> parent;
     EntityRef<Entity> child;
