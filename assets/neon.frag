@@ -32,22 +32,41 @@ vec2 distort_pos(vec2 pos)
 
 void main()
 {
-    vec2 pos = distort_pos(2 * uv - vec2(1));
+    vec2 pos = 2 * uv - vec2(1);
+    float d = 0;
     // NOTE: From 1 to 0
 
-    // float d = circle(pos, vec2(0, 0), 0.8);
-    // d = min(d, line(pos, vec2(-0.8, 0), vec2(0.8, 0), 0));
+    //circle
+    if(true) {
+        d = circle(pos, vec2(0, 0), 0.8);
+        // d = min(d, line(pos, vec2(-0.8, 0), vec2(0.8, 0), 0));
+    }
 
-    float a = line(pos, vec2(-0.8, 0), vec2(0.8, 0), 0);
-    float b = line(pos, vec2(0.8, 0), vec2(0, 0.8), 0);
-    float c = line(pos, vec2(-0.8, 0), vec2(0, 0.8), 0);
+    // triangle - light unit
+    if(false) {
+        float a = line(pos, vec2(-0.5, 0), vec2(0.5, 0), 0);
+        float b = line(pos, vec2(0.5, 0), vec2(0, 0.5), 0);
+        float c = line(pos, vec2(-0.5, 0), vec2(0, 0.5), 0);
 
-    float d = min(a, b);
-    d = min(d, c);
+        d = min(a, b);
+        d = min(d, c);
+    }
+
+    // rectangle
+    if(false) {
+        float a = line(pos, vec2(-0.5, 0), vec2(0.5, 0), 0);
+        float b = line(pos, vec2(0.5, 0), vec2(0.5, 0.5), 0);
+        float c = line(pos, vec2(-0.5, 0.5), vec2(0.5, 0.5), 0);
+        float e = line(pos, vec2(-0.5, 0), vec2(-0.5, 0.5), 0);
+
+        d = min(a, b);
+        d = min(d, c);
+        d = min(d, e);
+    }
 
     float thickness = 0.06;
     float intensity = thickness / d;
     intensity = intensity * intensity * intensity;
-    out_Color = vec4(color * intensity, 1);
+    out_Color = vec4(color * intensity, intensity);
     // out_Color += 0.5 * vec4(1, 1, 1, 1);
 }
