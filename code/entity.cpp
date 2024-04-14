@@ -10,40 +10,36 @@ struct Entity;
 template<typename T>
 struct EntityRef
 {
+
+    u32 id;
+    u32 generation;
+
     T *operator*()
     {
-        return ref;
+        if (generation > state->entity_generations[id]) {
+            return NULL;
+        }
+
+        return (T*) (state->entity_slots + id);
     }
 
     T *operator->()
     {
-        return ref;
+        if (generation > state->entity_generations[id]) {
+            return NULL;
+        }
+
+        return (T*) (state->entity_slots + id);
     }
 
-    T *ref;
 };
 
 template<typename T>
-T* AllocateEntity(GameState *state)
-{
-    u32 id = state->free_entities[state->free_entity_count];
-    state->free_entity_count--;
-
-    T *entity = new ((void*) (state->entity_slots + id)) T;
-
-    entity->id = id;
-    entity->generation = state->entity_generations[id];
-
-    return entity;
-}
+T* AllocateEntity();
 
 template<typename T>
-EntityRef<T> make_ref(Entity *target)
-{
-    return {
-        (T *) target
-    };
-};
+EntityRef<T> MakeRef(Entity *target);
+
 
 struct Entity
 {
@@ -160,8 +156,8 @@ struct Entity
         }
         new_child->next = child;
 
-        child = make_ref<Entity>(new_child);
-        child->parent = make_ref<Entity>(this);
+        child = MakeRef<Entity>(new_child);
+        child->parent = MakeRef<Entity>(this);
 
         // Activate new child if required and self active
         if (new_child->flags & EntityStateFlag::ACTIVE) return;
@@ -180,10 +176,10 @@ struct Entity
 
                 if (previous) {
                     previous->next = current->next;
-                    current->parent = make_ref<Entity>(nullptr);
+                    current->parent = MakeRef<Entity>(nullptr);
                 } else {
                     child = current->next;
-                    current->parent = make_ref<Entity>(nullptr);
+                    current->parent = MakeRef<Entity>(nullptr);
                 }
 
                 if (current->flags & EntityStateFlag::ACTIVE) current->OnDisable();
@@ -203,7 +199,7 @@ struct Entity
             RemoveChild(this);
         }
 
-        parent = make_ref<Entity>(new_parent);
+        parent = MakeRef<Entity>(new_parent);
     }
 
     Entity *PopChild()
@@ -213,3 +209,23 @@ struct Entity
         return old_child;
     }
 };
+
+template<typename T>
+EntityRef<T> MakeRef(Entity *target)
+{
+    return { target->id, target->generation };
+};
+
+template<typename T>
+T* AllocateEntity()
+{
+    u32 id = state->free_entities[state->free_entity_count];
+    state->free_entity_count--;
+
+    T *entity = new ((void*) (state->entity_slots + id)) T;
+
+    entity->id = id;
+    entity->generation = state->entity_generations[id];
+
+    return entity;
+}

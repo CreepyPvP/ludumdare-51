@@ -40,6 +40,8 @@ struct GameState
     u32 *free_entities;
 };
 
+GameState *state;
+
 #include "entity.cpp"
 #include "game_entity.cpp"
 #include "arena.cpp"
@@ -80,11 +82,11 @@ i32 main(void)
     u64 memory_size = Megabytes(1);
     void *memory = malloc(memory_size);
 
-    GameState *state = create_game_state(memory, memory_size);
+    state = create_game_state(memory, memory_size);
 
-    Entity *root = AllocateEntity<Entity>(state);
-    TestEntity *child_a = AllocateEntity<TestEntity>(state);
-    Entity *child_b = AllocateEntity<Entity>(state);
+    Entity *root = AllocateEntity<Entity>();
+    TestEntity *child_a = AllocateEntity<TestEntity>();
+    Entity *child_b = AllocateEntity<Entity>();
 
     root->PushChild(child_b);
     child_b->local_position = {0, 0};
