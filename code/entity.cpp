@@ -245,6 +245,6 @@ void DeleteEntity(T *entity)
     }
 
     state->entity_generations[entity->id]++;
-    state->free_entities[state->free_entity_count] = entity[id];
+    state->free_entities[state->free_entity_count] = entity[entity->id];
     state->free_entity_count++;
 }
