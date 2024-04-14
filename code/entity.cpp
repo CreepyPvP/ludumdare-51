@@ -240,5 +240,11 @@ T* AllocateEntity()
 template<typename T>
 void DeleteEntity(T *entity)
 {
+    if (entity->generation < state->entity_generations[entity->id]) {
+        return;
+    }
 
+    state->entity_generations[entity->id]++;
+    state->free_entities[state->free_entity_count] = entity[id];
+    state->free_entity_count++;
 }
