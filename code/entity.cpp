@@ -233,7 +233,7 @@ T* AllocateEntity()
 
     entity->id = id;
     entity->generation = state->entity_generations[id];
-
+    entity->OnCreate();
     return entity;
 }
 
@@ -243,6 +243,8 @@ void DeleteEntity(T *entity)
     if (entity->generation < state->entity_generations[entity->id]) {
         return;
     }
+
+    entity->OnDestroy();
 
     state->entity_generations[entity->id]++;
     state->free_entities[state->free_entity_count] = entity[entity->id];

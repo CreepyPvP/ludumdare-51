@@ -29,7 +29,7 @@ struct DevelopmentScene: Entity {
             Entity* old_child = *child;
             if(old_child) {
                 old_child->SetParent(nullptr);
-                // TODO remove entity
+                DeleteEntity(old_child);
             }
             Entity* new_child = AllocateEntity<UnitManagementTestScene>();
 
