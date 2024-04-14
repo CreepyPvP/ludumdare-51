@@ -38,6 +38,9 @@ template<typename T>
 T* AllocateEntity();
 
 template<typename T>
+void DeleteEntity(T *entity);
+
+template<typename T>
 EntityRef<T> MakeRef(Entity *target);
 
 
@@ -228,4 +231,10 @@ T* AllocateEntity()
     entity->generation = state->entity_generations[id];
 
     return entity;
+}
+
+template<typename T>
+void DeleteEntity(T *entity)
+{
+
 }

@@ -62,11 +62,12 @@ static GameState *create_game_state(void *memory, u64 memory_size)
 
     state->entity_cap = 100;
     state->entity_slots = PushArray(&state->arena, EntitySlot, state->entity_cap);
-    state->entity_generations = PushZeroArray(&state->arena, u32, state->entity_cap);
+    state->entity_generations = PushArray(&state->arena, u32, state->entity_cap);
     state->free_entity_count = state->entity_cap;
     state->free_entities = PushArray(&state->arena, u32, state->entity_cap);
     for (u32 i = 0; i < state->entity_cap; ++i) {
         state->free_entities[i] = i;
+        state->entity_generations[i] = 1;
     }
 
     return state;
