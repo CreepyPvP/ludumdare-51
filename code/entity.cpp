@@ -264,8 +264,6 @@ T* AllocateEntity()
     entity->generation = state->entity_generations[id];
     entity->OnCreate();
 
-    TraceLog(LOG_DEBUG, "Allocate");
-
     return entity;
 }
 
@@ -286,5 +284,4 @@ void DeleteEntity(T *entity)
     state->entity_generations[entity->id]++;
     state->free_entities[state->free_entity_count] = entity->id;
     state->free_entity_count++;
-    TraceLog(LOG_INFO, "DESTROY");
 }
