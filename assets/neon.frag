@@ -40,30 +40,79 @@ void main()
 
     //circle
     if(entity_type == 0) {
-        d = circle(pos, vec2(0.0, 0.0), 0.8);
+        d = circle(pos, vec2(0.0, 0.0), 0.5);
         // d = min(d, line(pos, vec2(-0.8, 0), vec2(0.8, 0), 0));
     }
 
     // triangle - light unit
     if(entity_type == 1) {
-        float a = line(pos, vec2(-0.5, 0.0), vec2(0.5, 0), 0.0);
-        float b = line(pos, vec2(0.5, 0.0), vec2(0.0, 0.5), 0.0);
-        float c = line(pos, vec2(-0.5, 0.0), vec2(0.0, 0.5), 0.0);
+        float a = line(pos, vec2(-0.5, -0.5), vec2(0.5, -0.5), 0.0);
+        float b = line(pos, vec2(0.5, -0.5), vec2(0.0, 0.5), 0.0);
+        float c = line(pos, vec2(-0.5, -0.5), vec2(0.0, 0.5), 0.0);
 
         d = min(a, b);
         d = min(d, c);
     }
 
     // rectangle
-    if(entity_type == 2) {
-        float a = line(pos, vec2(-0.5, 0.0), vec2(0.5, 0.0), 0.0);
-        float b = line(pos, vec2(0.5, 0.0), vec2(0.5, 0.5), 0.0);
-        float c = line(pos, vec2(-0.5, 0.5), vec2(0.5, 0.5), 0.0);
-        float e = line(pos, vec2(-0.5, 0.0), vec2(-0.5, 0.5), 0.0);
+    // if(false)
+    // {
+    //     float a = line(pos, vec2(-0.5, 0.0), vec2(0.5, 0.0), 0.0);
+    //     float b = line(pos, vec2(0.5, 0.0), vec2(0.5, 0.5), 0.0);
+    //     float c = line(pos, vec2(-0.5, 0.5), vec2(0.5, 0.5), 0.0);
+    //     float e = line(pos, vec2(-0.5, 0.0), vec2(-0.5, 0.5), 0.0);
+    //
+    //     d = min(a, b);
+    //     d = min(d, c);
+    //     d = min(d, e);
+    // }
+
+    // square
+    if(entity_type == 2)
+    {
+        float a = line(pos, vec2(-0.5, -0.5), vec2(0.5, -0.5), 0.0);
+        float b = line(pos, vec2(0.5, -0.5), vec2(0.5, 0.5), 0.0);
+        float c = line(pos, vec2(-0.5, -0.5), vec2(-0.5, 0.5), 0.0);
+        //float e = line(pos, vec2(-0.5, 0.5), vec2(0.5, 0.5), 0.0);
+        float f = line(pos, vec2(0.25, 0.25), vec2(0.25, 0.5), 0.0);
+
+        d = min(a, b);
+        d = min(d, c);
+        //d = min(d, e);
+        d = min(d, f);
+    }
+
+    // cross
+    if(entity_type == 3)
+    {
+
+        float a = line(pos, vec2(-0.25, -0.5), vec2(0.25, -0.5), 0.0);
+        float b = line(pos, vec2(0.25, -0.5), vec2(0.25, -0.25), 0.0);
+        float c = line(pos, vec2(0.25, -0.25), vec2(0.5, -0.25), 0.0);
+        float e = line(pos, vec2(0.5, -0.25), vec2(0.5, 0.25), 0.0);
+        float f = line(pos, vec2(0.25, 0.25), vec2(0.5, 0.25), 0.0);
+        float g = line(pos, vec2(0.25, 0.25), vec2(0.25, 0.5), 0.0);
+        float h = line(pos, vec2(-0.25, 0.5), vec2(0.25, 0.5), 0.0);
+        float i = line(pos, vec2(-0.25, 0.25), vec2(-0.25, 0.5), 0.0);
+        float j = line(pos, vec2(-0.25, 0.25), vec2(-0.5, 0.25), 0.0);
+        float k = line(pos, vec2(-0.5, 0.25), vec2(-0.5, -0.25), 0.0);
+        float l = line(pos, vec2(-0.25, -0.25), vec2(-0.5, -0.25), 0.0);
+        float m = line(pos, vec2(-0.25, -0.25), vec2(-0.25, -0.5), 0.0);
+
+
+        float p = line(pos, vec2(-0.25, 0.5), vec2(0.25, 0.5), 0.0);
 
         d = min(a, b);
         d = min(d, c);
         d = min(d, e);
+        d = min(d, f);
+        d = min(d, g);
+        d = min(d, h);
+        d = min(d, i);
+        d = min(d, j);
+        d = min(d, k);
+        d = min(d, l);
+        d = min(d, m);
     }
 
     float thickness = 0.06;

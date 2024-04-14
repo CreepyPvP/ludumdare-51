@@ -36,6 +36,7 @@ struct UnitEntity : Entity
 
     float enemy_detection_range = 100;
     float attack_range = 25;
+    float projectile_speed = 150;
 
     float attack_merge_range = 5;
     u32 damage = 3;
@@ -82,9 +83,11 @@ struct UnitEntity : Entity
 struct ProjectileEntity : Entity
 {
     EntityRef<UnitEntity> target{};
-    float speed = 20;
+    float speed = 100;
     u32 damage = 3;
     Color color = BLUE;
+
+    float hitRange = 5;
 
     void Update() override
     {
@@ -93,6 +96,19 @@ struct ProjectileEntity : Entity
             DeleteEntity(this);
             return;
         }
+
+        Vector3 delta = Vector3Subtract(target_ref->local_position, local_position);
+        float combinedDistance = hitRange + target_ref->protection_distance / 2.0f;
+        if(Vector3LengthSqr(delta) < combinedDistance * combinedDistance) {
+            HitTarget();
+            return;
+        }
+
+        delta = Vector3Normalize(delta);
+
+        local_position.x += delta.x * speed * GetFrameTime();
+        local_position.y += delta.y * speed * GetFrameTime();
+
     }
 
     void OnRender() override
@@ -102,7 +118,7 @@ struct ProjectileEntity : Entity
 
     void HitTarget()
     {
-        target->Damage(12);
+        target->Damage(damage);
         DeleteEntity(this);
     }
 };
@@ -123,6 +139,8 @@ void UnitEntity::TryAttack(UnitEntity *target_unit)
         ProjectileEntity *projectile = AllocateEntity<ProjectileEntity>();
         projectile->local_position = local_position;
         projectile->damage = damage;
+        projectile->color = GREEN;
+        projectile->speed = projectile_speed;
         projectile->target = MakeRef<UnitEntity>(target_unit);
 
         TraceLog(LOG_INFO, "Shoot %d(%d) -> %d(%d) for %d.", this->team, this->id, target_unit->team,
