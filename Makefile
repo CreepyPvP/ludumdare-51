@@ -19,7 +19,7 @@ $(info Building for web...)
 endif
 CC := emcc
 AR := emar
-COMPILER_OPTS := -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
+COMPILER_OPTS := -Os -Wno-enum-compare -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
 COMPILER_OPTS_RAYLIB := $(COMPILER_OPTS)
 PLAT_ID := web
 WEB := 1
@@ -32,9 +32,9 @@ AR := ar
 PLAT_ID := win
 
 ifndef PROD
-COMPILER_OPTS := -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib -g -O0
+COMPILER_OPTS := -Wno-enum-compare -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib -g -O0
 else
-COMPILER_OPTS := -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib
+COMPILER_OPTS := -Wno-enum-compare -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib
 endif
 COMPILER_OPTS_RAYLIB := $(COMPILER_OPTS) -D_GNU_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -I raylib/external/glfw/include
 DESKTOP := 1

@@ -226,10 +226,17 @@ EntityRef<T> MakeRef(Entity *target)
 template<typename T>
 T* AllocateEntity()
 {
+    if (sizeof(T) > sizeof(EntitySlot)) {
+        TraceLog(LOG_ERROR, "Sizeof Entity [%u] exceeds Sizeof EntitySlot [%u]\n", sizeof(T), sizeof(EntitySlot));
+        assert(0);
+    }
+
+    assert(state->free_entity_count > 0);
+
     u32 id = state->free_entities[state->free_entity_count];
     state->free_entity_count--;
 
-    T *entity = new ((void*) (state->entity_slots + id)) T;
+    T *entity = new ((void*) &state->entity_slots[id]) T;
 
     entity->id = id;
     entity->generation = state->entity_generations[id];
