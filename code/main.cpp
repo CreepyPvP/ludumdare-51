@@ -74,6 +74,31 @@ static GameState *create_game_state(void *memory, u64 memory_size)
     return state;
 }
 
+void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color)
+{
+
+    rlBegin(RL_QUADS);
+
+        rlNormal3f(0.0f, 0.0f, 1.0f);
+        rlColor4ub(color.r, color.g, color.b, color.a);
+
+        rlTexCoord2f(0, 1);
+        rlVertex2f(x - width / 2, y - height / 2);
+
+        rlTexCoord2f(0, 0);
+        rlVertex2f(x - width / 2, y + height / 2);
+
+        rlTexCoord2f(1, 0);
+        rlVertex2f(x + width / 2, y + height / 2);
+
+        rlTexCoord2f(1, 1);
+        rlVertex2f(x + width / 2, y - height / 2);
+
+    rlEnd();
+
+    rlSetTexture(0);
+}
+
 i32 main(void)
 {
     SetTraceLogLevel(LOG_DEBUG);
@@ -125,13 +150,9 @@ i32 main(void)
         BeginShaderMode(neon_shader);
 
         root->Render();
-        // DrawRectangle(150, 170, 100, 100, BLUE);
-        // DrawRectangle(350, 170, 100, 100, GREEN);
-        // DrawRectangle(550, 170, 100, 100, RED);
-
-        // DrawRectangle(100, 200, 200, 200, {255, 0, 0, 255});
-        // DrawRectangle(300, 200, 200, 200, {0, 255, 0, 255});
-        // DrawRectangle(500, 200, 200, 200, {0, 0, 255, 255});
+        DrawSprite(200, 240, 100, 100, BLUE);
+        DrawSprite(400, 240, 100, 100, GREEN);
+        DrawSprite(600, 240, 100, 100, RED);
 
         EndShaderMode();
         EndDrawing();
