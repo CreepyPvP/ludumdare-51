@@ -5,6 +5,9 @@ in vec3 color;
 
 uniform float seconds;
 
+uniform int type;
+uniform int modifier;
+
 out vec4 out_Color;
 
 float circle(vec2 pos, vec2 center, float radius)
