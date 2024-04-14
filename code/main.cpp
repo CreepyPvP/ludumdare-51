@@ -131,7 +131,7 @@ i32 main(void)
     // printf("Got string: %s\n", file);
     // UnloadFileData(file);
 
-    Shader neon_shader = LoadShader("assets/web.vert", "assets/web.frag");
+    Shader neon_shader = LoadShader("assets/neon.vert", "assets/neon.frag");
 
     i32 seconds_loc = GetShaderLocation(neon_shader, "seconds");
 

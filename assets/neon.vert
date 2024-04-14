@@ -1,13 +1,13 @@
-#version 330
+#version 100
 
-in vec3 vertexPosition;
-in vec2 vertexTexCoord;
-in vec3 vertexColor;
+attribute vec3 vertexPosition;
+attribute vec2 vertexTexCoord;
+attribute vec3 vertexColor;
 
 uniform mat4 mvp;
 
-out vec2 uv;
-out vec3 color;
+varying vec2 uv;
+varying vec3 color;
 
 void main() {
     uv = vertexTexCoord;

@@ -2,5 +2,5 @@ npx http-server -o ./
 
 TODO:
 
-Wave effect
-Bloom
+Unit types / flags
+Debug Ui

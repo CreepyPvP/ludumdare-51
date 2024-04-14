@@ -1,14 +1,15 @@
-#version 330
+#version 100
 
-in vec2 uv;
-in vec3 color;
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+
+varying vec2 uv;
+varying vec3 color;
 
 uniform float seconds;
-
-uniform int type;
-uniform int modifier;
-
-out vec4 out_Color;
 
 float circle(vec2 pos, vec2 center, float radius)
 {
@@ -25,28 +26,28 @@ float line(vec2 pos, vec2 a, vec2 b, float r )
 
 vec2 distort_pos(vec2 pos)
 {
-    pos.x += cos(seconds * 10 + pos.x * 7.5 + pos.y * 3) * 0.04;
-    pos.y += sin(seconds * 10 + pos.y * 7.5 + pos.x * 3) * 0.04;
+    pos.x += cos(seconds * 10.0 + pos.x * 7.5 + pos.y * 3.0) * 0.04;
+    pos.y += sin(seconds * 10.0 + pos.y * 7.5 + pos.x * 3.0) * 0.04;
     return pos;
 }
 
 void main()
 {
-    vec2 pos = 2 * uv - vec2(1);
-    float d = 0;
+    vec2 pos = 2.0 * uv - vec2(1.0);
+    float d = 0.0;
     // NOTE: From 1 to 0
 
     //circle
     if(true) {
-        d = circle(pos, vec2(0, 0), 0.8);
+        d = circle(pos, vec2(0.0, 0.0), 0.8);
         // d = min(d, line(pos, vec2(-0.8, 0), vec2(0.8, 0), 0));
     }
 
     // triangle - light unit
     if(false) {
-        float a = line(pos, vec2(-0.5, 0), vec2(0.5, 0), 0);
-        float b = line(pos, vec2(0.5, 0), vec2(0, 0.5), 0);
-        float c = line(pos, vec2(-0.5, 0), vec2(0, 0.5), 0);
+        float a = line(pos, vec2(-0.5, 0.0), vec2(0.5, 0), 0.0);
+        float b = line(pos, vec2(0.5, 0.0), vec2(0.0, 0.5), 0.0);
+        float c = line(pos, vec2(-0.5, 0.0), vec2(0.0, 0.5), 0.0);
 
         d = min(a, b);
         d = min(d, c);
@@ -54,10 +55,10 @@ void main()
 
     // rectangle
     if(false) {
-        float a = line(pos, vec2(-0.5, 0), vec2(0.5, 0), 0);
-        float b = line(pos, vec2(0.5, 0), vec2(0.5, 0.5), 0);
-        float c = line(pos, vec2(-0.5, 0.5), vec2(0.5, 0.5), 0);
-        float e = line(pos, vec2(-0.5, 0), vec2(-0.5, 0.5), 0);
+        float a = line(pos, vec2(-0.5, 0.0), vec2(0.5, 0.0), 0.0);
+        float b = line(pos, vec2(0.5, 0.0), vec2(0.5, 0.5), 0.0);
+        float c = line(pos, vec2(-0.5, 0.5), vec2(0.5, 0.5), 0.0);
+        float e = line(pos, vec2(-0.5, 0.0), vec2(-0.5, 0.5), 0.0);
 
         d = min(a, b);
         d = min(d, c);
@@ -67,6 +68,5 @@ void main()
     float thickness = 0.06;
     float intensity = thickness / d;
     intensity = intensity * intensity * intensity;
-    out_Color = vec4(color * intensity, intensity);
-    // out_Color += 0.5 * vec4(1, 1, 1, 1);
+    gl_FragColor = vec4(color * intensity, 1.0);
 }
