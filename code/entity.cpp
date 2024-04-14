@@ -257,9 +257,11 @@ void DeleteEntity(T *entity)
         return;
     }
 
+
     entity->OnDestroy();
 
     state->entity_generations[entity->id]++;
     state->free_entities[state->free_entity_count] = entity->id;
     state->free_entity_count++;
+    TraceLog(LOG_INFO, "DESTROY");
 }
