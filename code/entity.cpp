@@ -16,7 +16,7 @@ struct EntityRef
 
     T *operator*()
     {
-        if (generation > state->entity_generations[id]) {
+        if (generation < state->entity_generations[id]) {
             return NULL;
         }
 
