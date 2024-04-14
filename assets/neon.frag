@@ -55,7 +55,7 @@ void main()
     }
 
     // rectangle
-    if(false) {
+    if(entity_type == 2) {
         float a = line(pos, vec2(-0.5, 0.0), vec2(0.5, 0.0), 0.0);
         float b = line(pos, vec2(0.5, 0.0), vec2(0.5, 0.5), 0.0);
         float c = line(pos, vec2(-0.5, 0.5), vec2(0.5, 0.5), 0.0);

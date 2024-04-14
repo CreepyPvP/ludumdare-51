@@ -2,23 +2,23 @@ struct UnitTestRenderScene : Entity
 {
 
     bool checked = false;
+    bool dropdown_edit;
+
+    UnitEntity *entity;
 
     void OnCreate() override
     {
         TraceLog(LOG_INFO, "Started Unit Test Render Scene");
 
-        UnitEntity *unit = AllocateEntity<UnitEntity>();
-        PushChild(unit);
-        unit->local_position = {400, 225};
-
-        unit = AllocateEntity<UnitEntity>();
-        unit->appearance = ARCHER;
-        PushChild(unit);
-        unit->local_position = {700, 225};
+        entity = AllocateEntity<UnitEntity>();
+        PushChild(entity);
+        entity->local_position = {400, 225};
     }
 
     void Update() override
     {
+        Entity::Update();
+
         UnitEntity *unit = (UnitEntity *) *child;
         if (checked && unit->team == UnitTeam::HOSTILE)
         {
@@ -32,6 +32,21 @@ struct UnitTestRenderScene : Entity
 
     void RenderGUI() override
     {
-        GuiCheckBox((Rectangle){ 0, 10, 15, 15 }, "Unit friendly", &checked);
+        if (!entity) {
+            return;
+        }
+
+        if (dropdown_edit) {
+            GuiLock();
+        }
+
+        GuiCheckBox((Rectangle){ 10, 20, 20, 20 }, "Unit friendly", &checked);
+        GuiUnlock();
+
+        if (GuiDropdownBox((Rectangle){ 10, 50, 125, 30 },
+                           "LIGHT;ARCHER;TANK;MEDIC;PROJECTILE",
+                           (i32*) &entity->appearance, dropdown_edit)) {
+            dropdown_edit = !dropdown_edit;
+        }
     }
 };

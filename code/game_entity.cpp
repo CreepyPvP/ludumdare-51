@@ -36,10 +36,8 @@ struct UnitManagementTestScene : Entity
                 unit->local_position = {800, 0};
                 unit->enemy_detection_range = 999999;
                 unit->move_factor = unit->move_factor * 3;
-                unit->color = BLUE;
             } else {
                 unit->team = UnitTeam::HOSTILE;
-                unit->color = RED;
                 unit->overall_target = MakeRef<Entity>(tesseract);
             }
 

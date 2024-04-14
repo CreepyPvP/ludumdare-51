@@ -1,7 +1,7 @@
 enum UnitTeam
 {
+    HOSTILE,
     FRIENDLY,
-    HOSTILE
 };
 
 enum UnitAttackType
@@ -21,9 +21,9 @@ enum AppearanceType
 
 struct UnitEntity : Entity
 {
-    UnitTeam team = UnitTeam::HOSTILE;
-    UnitAttackType attack_type = UnitAttackType::MELEE;
-    AppearanceType appearance = AppearanceType::LIGHT;
+    UnitTeam team;
+    UnitAttackType attack_type;
+    AppearanceType appearance;
 
     EntityRef<Entity> overall_target{};
     EntityRef<Entity> projectile_container{};
@@ -43,11 +43,14 @@ struct UnitEntity : Entity
     u32 health = 10;
     float attack_speed = 1;
     float attack_cooldown = 0;
-    Color color = BLUE;
 
 
     void OnRender() override
     {
+        Color color = BLUE;
+        if (team == HOSTILE) {
+            color = RED;
+        }
         DrawSprite(0, 0, 40, 40, color, appearance);
     }
 
@@ -120,7 +123,6 @@ void UnitEntity::TryAttack(UnitEntity *target_unit)
         ProjectileEntity *projectile = AllocateEntity<ProjectileEntity>();
         projectile->local_position = local_position;
         projectile->damage = damage;
-        projectile->color = color;
         projectile->target = MakeRef<UnitEntity>(target_unit);
 
         TraceLog(LOG_INFO, "Shoot %d(%d) -> %d(%d) for %d.", this->team, this->id, target_unit->team,
