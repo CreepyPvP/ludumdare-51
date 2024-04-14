@@ -242,7 +242,7 @@ T* AllocateEntity()
 template<typename T>
 void DeleteEntity(T *entity)
 {
-    if(entity->flags & ~EntityStateFlag::TO_BE_DESTROYED) return;
+    if(entity->flags & EntityStateFlag::TO_BE_DESTROYED) return;
     if (entity->generation < state->entity_generations[entity->id]) {
         return;
     }

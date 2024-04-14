@@ -56,7 +56,6 @@ struct DevelopmentScene : Entity
             TraceLog(LOG_INFO, "Swap to Unit Scene");
             Entity *old_child = *child;
             if (old_child) {
-                old_child->SetParent(nullptr);
                 DeleteEntity(old_child);
             }
             Entity *new_child = AllocateEntity<UnitManagementTestScene>();
