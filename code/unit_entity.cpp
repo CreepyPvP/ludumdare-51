@@ -1,13 +1,21 @@
-enum UnityType
+enum UnitTeam
 {
     FRIENDLY,
     HOSTILE
 };
 
+enum UnitAttackType
+{
+    MELEE,
+    RANGED
+};
+
 struct UnitEntity : Entity
 {
-    UnityType type = UnityType::HOSTILE;
+    UnitTeam team = UnitTeam::HOSTILE;
+    UnitAttackType attack_type = UnitAttackType::MELEE;
     EntityRef<Entity> overall_target{};
+    EntityRef<Entity> projectile_container{};
 
 
     // float avoid_factor = 30;
@@ -24,15 +32,16 @@ struct UnitEntity : Entity
     u32 health = 10;
     float attack_speed = 1;
     float attack_cooldown = 0;
+    Color color = BLUE;
 
     void OnRender() override
     {
-        DrawSprite(-20, -20, 40, 40, BLUE);
+        DrawSprite(0, 0, 40, 40, color);
     }
 
     void Update() override
     {
-        if(health == 0) {
+        if (health == 0) {
             TraceLog(LOG_INFO, "Death");
             DeleteEntity(this);
             return;
@@ -51,8 +60,63 @@ struct UnitEntity : Entity
         }
         health -= damage_received;
     }
+
+    void TryAttack(UnitEntity *target_unit);
 };
 
+struct ProjectileEntity : Entity
+{
+    EntityRef<UnitEntity> target{};
+    float speed = 20;
+    u32 damage = 3;
+    Color color = BLUE;
+
+    void Update() override
+    {
+        UnitEntity *target_ref = *target;
+        if(!target_ref) {
+            DeleteEntity(this);
+            return;
+        }
+    }
+
+    void OnRender() override
+    {
+        DrawSprite(0, 0, 10, 10, color);
+    }
+
+    void HitTarget()
+    {
+        target->Damage(12);
+        DeleteEntity(this);
+    }
+};
+
+
+void UnitEntity::TryAttack(UnitEntity *target_unit)
+{
+    if (this->attack_cooldown > 0) return;
+
+    if (attack_type == UnitAttackType::MELEE) {
+        this->attack_cooldown = this->attack_speed;
+        target_unit->Damage(this->damage);
+        TraceLog(LOG_INFO, "Attack %d(%d) -> %d(%d) for %d. Remaining %d", this->team, this->id, target_unit->team,
+                 target_unit->id, this->damage, target_unit->health);
+    } else if (attack_type == UnitAttackType::RANGED) {
+        this->attack_cooldown = this->attack_speed;
+
+        ProjectileEntity *projectile = AllocateEntity<ProjectileEntity>();
+        projectile->local_position = local_position;
+        projectile->damage = damage;
+        projectile->color = color;
+        projectile->target = MakeRef<UnitEntity>(target_unit);
+
+        TraceLog(LOG_INFO, "Shoot %d(%d) -> %d(%d) for %d.", this->team, this->id, target_unit->team,
+                 target_unit->id, this->damage);
+
+        projectile_container->PushChild(projectile);
+    }
+}
 
 struct UnitManagementEntity : Entity
 {
@@ -96,7 +160,7 @@ struct UnitManagementEntity : Entity
 
 
             Vector3 delta = Vector3Subtract(current_target->local_position, other_target->local_position);
-            if (other_target->type != current_target->type) {
+            if (other_target->team != current_target->team) {
 
                 float distanceSqr = Vector3LengthSqr(delta);
                 if (distanceSqr > (enemy_detection_range * enemy_detection_range)) {
@@ -135,11 +199,7 @@ struct UnitManagementEntity : Entity
 
             if (dist < (attack_range * attack_range)) {
 
-                if (current_target->attack_cooldown > 0) return;
-
-                current_target->attack_cooldown = current_target->attack_speed;
-                closest_enemy->Damage(current_target->damage);
-                TraceLog(LOG_INFO, "Attack %d(%d) -> %d(%d) for %d. Remaining %d", current_target->type, current_target->id, closest_enemy->type, closest_enemy->id, current_target->damage, closest_enemy->health);
+                current_target->TryAttack(closest_enemy);
                 return;
             }
 

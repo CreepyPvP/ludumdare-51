@@ -32,7 +32,7 @@ typedef double f64;
 
 struct EntitySlot
 {
-    char buffer[128];
+    char buffer[256];
 };
 
 struct GameState

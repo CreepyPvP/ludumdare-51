@@ -22,8 +22,9 @@ struct UnitManagementTestScene : Entity
     {
         Entity *unit_management = AllocateEntity<UnitManagementEntity>();
         Entity *tesseract = AllocateEntity<Entity>();
+        Entity *projectile_container = AllocateEntity<Entity>();
 
-        tesseract->local_position = {(float) state->screen_width/2.0f, (float) state->screen_height/2.0f};
+        tesseract->local_position = {(float) state->screen_width / 2.0f, (float) state->screen_height / 2.0f};
 
 
         u32 amount = 10;
@@ -31,21 +32,31 @@ struct UnitManagementTestScene : Entity
             UnitEntity *unit = AllocateEntity<UnitEntity>();
 
             if (amount / 2 < i) {
-                unit->type = UnityType::FRIENDLY;
+                unit->team = UnitTeam::FRIENDLY;
                 unit->local_position = {800, 0};
                 unit->enemy_detection_range = 999999;
                 unit->move_factor = unit->move_factor * 3;
+                unit->color = BLUE;
             } else {
-                unit->type = UnityType::HOSTILE;
+                unit->team = UnitTeam::HOSTILE;
+                unit->color = RED;
                 unit->overall_target = MakeRef<Entity>(tesseract);
             }
 
-            TraceLog(LOG_INFO, "Spawn unit %d(%d)", unit->type, unit->id);
+            if(i % 2 == 0) {
+                unit->attack_type = UnitAttackType::RANGED;
+                unit->attack_range = unit->attack_range * 4;
+            }
+
+            unit->projectile_container = MakeRef<Entity>(projectile_container);
+
+            TraceLog(LOG_INFO, "Spawn unit %d(%d)", unit->team, unit->id);
 
 
             unit_management->PushChild(unit);
         }
 
+        PushChild(projectile_container);
         PushChild(unit_management);
         PushChild(tesseract);
     }
