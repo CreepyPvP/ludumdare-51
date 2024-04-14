@@ -10,10 +10,21 @@ enum UnitAttackType
     RANGED
 };
 
+enum AppearanceType
+{
+    LIGHT,
+    ARCHER,
+    TANK,
+    MEDIC,
+    PROJECTILE
+};
+
 struct UnitEntity : Entity
 {
     UnitTeam team = UnitTeam::HOSTILE;
     UnitAttackType attack_type = UnitAttackType::MELEE;
+    AppearanceType appearance = AppearanceType::LIGHT;
+
     EntityRef<Entity> overall_target{};
     EntityRef<Entity> projectile_container{};
 
@@ -35,9 +46,10 @@ struct UnitEntity : Entity
     float attack_cooldown = 0;
     Color color = BLUE;
 
+
     void OnRender() override
     {
-        DrawSprite(0, 0, 40, 40, color);
+        DrawSprite(0, 0, 40, 40, color, appearance);
     }
 
     void Update() override
@@ -98,7 +110,7 @@ struct ProjectileEntity : Entity
 
     void OnRender() override
     {
-        DrawSprite(0, 0, 10, 10, color);
+        DrawSprite(0, 0, 10, 10, color, 0);
     }
 
     void HitTarget()

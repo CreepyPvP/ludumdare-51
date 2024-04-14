@@ -10,6 +10,7 @@ varying vec2 uv;
 varying vec3 color;
 
 uniform float seconds;
+uniform int entity_type;
 
 float circle(vec2 pos, vec2 center, float radius)
 {
@@ -38,13 +39,13 @@ void main()
     // NOTE: From 1 to 0
 
     //circle
-    if(true) {
+    if(entity_type == 0) {
         d = circle(pos, vec2(0.0, 0.0), 0.8);
         // d = min(d, line(pos, vec2(-0.8, 0), vec2(0.8, 0), 0));
     }
 
     // triangle - light unit
-    if(false) {
+    if(entity_type == 1) {
         float a = line(pos, vec2(-0.5, 0.0), vec2(0.5, 0), 0.0);
         float b = line(pos, vec2(0.5, 0.0), vec2(0.0, 0.5), 0.0);
         float c = line(pos, vec2(-0.5, 0.0), vec2(0.0, 0.5), 0.0);
@@ -68,5 +69,5 @@ void main()
     float thickness = 0.06;
     float intensity = thickness / d;
     intensity = intensity * intensity * intensity;
-    gl_FragColor = vec4(color * intensity, 1.0);
+    gl_FragColor = vec4(color * intensity, intensity);
 }
