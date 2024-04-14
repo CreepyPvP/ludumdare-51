@@ -9,8 +9,9 @@ struct UnitEntity : Entity
     UnityType type = UnityType::HOSTILE;
     EntityRef<Entity> overall_target{};
 
-    void Render() override {
-        DrawRectangle(-50, -50, 50, 50, BLUE);
+    void OnRender() override {
+        Vector3 pos = GetWorldPosition();
+        DrawRectangle(-50, -50, 100, 100, BLUE);
     }
 };
 
@@ -19,7 +20,7 @@ struct UnitManagementEntity : Entity
 {
 
     float avoid_factor = 0.1;
-    float move_factor = 10;
+    float move_factor = 5;
     float protection_distance = 40;
     float attack_range = 5;
     float attack_merge_range = 5;
@@ -76,7 +77,7 @@ struct UnitManagementEntity : Entity
             }
 
             if(closest_enemy) {
-                Vector3 delta = Vector3Subtract(current_target->local_position, closest_enemy->local_position);
+                Vector3 delta = Vector3Subtract(closest_enemy->local_position, current_target->local_position);
                 float dist = Vector3LengthSqr(delta);
 
                 if(dist < attack_range) {
@@ -87,7 +88,7 @@ struct UnitManagementEntity : Entity
                 current_target->local_position.x += delta.x * move_factor * GetFrameTime();
                 current_target->local_position.y += delta.y * move_factor * GetFrameTime();
             } else if(*current_target->overall_target) {
-                Vector3 delta = Vector3Subtract(current_target->local_position, current_target->overall_target->local_position);
+                Vector3 delta = Vector3Subtract(current_target->overall_target->local_position, current_target->local_position);
                 float dist = Vector3LengthSqr(delta);
 
                 if(dist < attack_merge_range) {

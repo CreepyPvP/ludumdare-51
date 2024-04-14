@@ -27,9 +27,10 @@ struct UnitManagementTestScene : Entity
 
         TraceLog(LOG_INFO, "CREATED");
 
-        u32 amount = 10;
+        u32 amount = 1;
         for (int i = 0; i < amount; ++i) {
             UnitEntity *unit = AllocateEntity<UnitEntity>();
+            // unit->local_position = {400, 225};
 
             if (amount / 2 < i) {
                 unit->type = UnityType::FRIENDLY;
@@ -43,17 +44,13 @@ struct UnitManagementTestScene : Entity
         PushChild(unit_management);
         PushChild(tesseract);
     }
-
-    void Update() override
-    {
-
-    }
 };
 
 struct DevelopmentScene : Entity
 {
     void Update() override
     {
+        Entity::Update();
         if (IsKeyPressed(KEY_F1)) {
             TraceLog(LOG_INFO, "Swap to Unit Scene");
             Entity *old_child = *child;

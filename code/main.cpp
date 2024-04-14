@@ -120,15 +120,15 @@ i32 main(void)
         ClearBackground(BLACK);
         BeginDrawing();
 
-        static bool checked = true;
-        GuiCheckBox((Rectangle){ 25, 108, 15, 15 }, "hello world", &checked);
+        // static bool checked = true;
+        // GuiCheckBox((Rectangle){ 25, 108, 15, 15 }, "hello world", &checked);
 
         BeginShaderMode(neon_shader);
 
         root->Render();
-        DrawRectangle(150, 170, 100, 100, BLUE);
-        DrawRectangle(350, 170, 100, 100, GREEN);
-        DrawRectangle(550, 170, 100, 100, RED);
+        // DrawRectangle(150, 170, 100, 100, BLUE);
+        // DrawRectangle(350, 170, 100, 100, GREEN);
+        // DrawRectangle(550, 170, 100, 100, RED);
 
         // DrawRectangle(100, 200, 200, 200, {255, 0, 0, 255});
         // DrawRectangle(300, 200, 200, 200, {0, 255, 0, 255});

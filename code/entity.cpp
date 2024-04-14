@@ -127,6 +127,7 @@ struct Entity
         rlRotatef(local_rotation.y,0, 1,0);
         rlRotatef(local_rotation.z,0, 0,1);
         rlScalef(local_scale.x, local_scale.y, local_scale.z);
+        OnRender();
         Entity *next_target = *child;
         while (next_target) {
             next_target->Render();
@@ -134,6 +135,11 @@ struct Entity
         }
 
         rlPopMatrix();
+    }
+
+    virtual void OnRender()
+    {
+
     }
 
     virtual void OnDisable()
