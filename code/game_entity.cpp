@@ -27,14 +27,15 @@ struct UnitManagementTestScene : Entity
 
         TraceLog(LOG_INFO, "CREATED");
 
-        u32 amount = 1;
+        u32 amount = 10;
         for (int i = 0; i < amount; ++i) {
             UnitEntity *unit = AllocateEntity<UnitEntity>();
-            // unit->local_position = {400, 225};
 
             if (amount / 2 < i) {
                 unit->type = UnityType::FRIENDLY;
+                unit->local_position = {800, 0};
             } else {
+                unit->type = UnityType::HOSTILE;
                 unit->overall_target = MakeRef<Entity>(tesseract);
             }
 
