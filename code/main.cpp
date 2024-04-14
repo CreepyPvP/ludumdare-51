@@ -50,6 +50,7 @@ GameState *state;
 
 #include "entity.cpp"
 #include "unit_entity.cpp"
+#include "unit_test_render_scene.cpp"
 #include "game_entity.cpp"
 #include "arena.cpp"
 
@@ -122,7 +123,7 @@ i32 main(void)
 
     SetShapesTexture({}, {});
 
-    DisableCursor();
+    // DisableCursor();
     SetTargetFPS(60);
 
     // i32 size;
@@ -144,8 +145,8 @@ i32 main(void)
         ClearBackground(BLACK);
         BeginDrawing();
 
-        static bool checked = true;
-        GuiCheckBox((Rectangle){ 25, 108, 15, 15 }, "hello world", &checked);
+        // static bool checked = true;
+        // GuiCheckBox((Rectangle){ 25, 108, 15, 15 }, "hello world", &checked);
 
         BeginShaderMode(neon_shader);
 
@@ -155,6 +156,7 @@ i32 main(void)
         DrawSprite(600, 240, 100, 100, RED);
 
         EndShaderMode();
+        root->RenderGUI();
         EndDrawing();
     }
 

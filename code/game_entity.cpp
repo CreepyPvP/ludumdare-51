@@ -23,6 +23,8 @@ struct UnitManagementTestScene : Entity
         Entity *unit_management = AllocateEntity<UnitManagementEntity>();
         Entity *tesseract = AllocateEntity<Entity>();
 
+        tesseract->local_position = {400, 225};
+
         TraceLog(LOG_INFO, "CREATED");
 
         u32 amount = 10;
@@ -31,7 +33,11 @@ struct UnitManagementTestScene : Entity
 
             if (amount / 2 < i) {
                 unit->type = UnityType::FRIENDLY;
+                unit->local_position = {800, 0};
+                unit->enemy_detection_range = 999999;
+                unit->move_factor = unit->move_factor * 2;
             } else {
+                unit->type = UnityType::HOSTILE;
                 unit->overall_target = MakeRef<Entity>(tesseract);
             }
 
@@ -41,17 +47,13 @@ struct UnitManagementTestScene : Entity
         PushChild(unit_management);
         PushChild(tesseract);
     }
-
-    void Update() override
-    {
-
-    }
 };
 
 struct DevelopmentScene : Entity
 {
     void Update() override
     {
+        Entity::Update();
         if (IsKeyPressed(KEY_F1)) {
             TraceLog(LOG_INFO, "Swap to Unit Scene");
             Entity *old_child = *child;
@@ -59,6 +61,15 @@ struct DevelopmentScene : Entity
                 DeleteEntity(old_child);
             }
             Entity *new_child = AllocateEntity<UnitManagementTestScene>();
+
+            new_child->SetParent(this);
+        }
+        if (IsKeyPressed(KEY_F2)) {
+            Entity *old_child = *child;
+            if (old_child) {
+                DeleteEntity(old_child);
+            }
+            Entity *new_child = AllocateEntity<UnitTestRenderScene>();
 
             new_child->SetParent(this);
         }

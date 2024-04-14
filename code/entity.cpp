@@ -110,6 +110,14 @@ struct Entity
             next_target = *next_target->next;
         }
     }
+    virtual void RenderGUI()
+    {
+        Entity *next_target = *child;
+        while (next_target) {
+            next_target->RenderGUI();
+            next_target = *next_target->next;
+        }
+    }
 
     virtual void Render()
     {
@@ -119,6 +127,7 @@ struct Entity
         rlRotatef(local_rotation.y,0, 1,0);
         rlRotatef(local_rotation.z,0, 0,1);
         rlScalef(local_scale.x, local_scale.y, local_scale.z);
+        OnRender();
         Entity *next_target = *child;
         while (next_target) {
             next_target->Render();
@@ -126,6 +135,11 @@ struct Entity
         }
 
         rlPopMatrix();
+    }
+
+    virtual void OnRender()
+    {
+
     }
 
     virtual void OnDisable()
@@ -160,8 +174,6 @@ struct Entity
         }
         new_child->next = child;
 
-        assert(new_child->id != child->id);
-
         child = MakeRef<Entity>(new_child);
         child->parent = MakeRef<Entity>(this);
 
@@ -182,11 +194,9 @@ struct Entity
 
                 if (previous) {
                     previous->next = current->next;
-                    assert(previous->id != current->id);
                     current->parent = MakeRef<Entity>(nullptr);
                 } else {
                     child = current->next;
-                    assert(child->id != current->id);
 
                     current->parent = MakeRef<Entity>(nullptr);
                     current->next = MakeRef<Entity>(nullptr);
