@@ -48,15 +48,15 @@ struct Entity
 {
     u32 id;
     u32 generation;
-    u32 flags;
+    u32 flags = 0;
 
     Vector3 local_position;
     Vector3 local_rotation;
     Vector3 local_scale = {1, 1, 1};
 
-    EntityRef<Entity> parent;
-    EntityRef<Entity> child;
-    EntityRef<Entity> next;
+    EntityRef<Entity> parent = {};
+    EntityRef<Entity> child = {};
+    EntityRef<Entity> next = {};
 
     Vector3 GetWorldPosition()
     {
@@ -221,6 +221,10 @@ struct Entity
 template<typename T>
 EntityRef<T> MakeRef(Entity *target)
 {
+    if (!target) {
+        return {};
+    }
+
     return { target->id, target->generation };
 };
 
@@ -238,10 +242,13 @@ T* AllocateEntity()
     state->free_entity_count--;
 
     T *entity = new ((void*) &state->entity_slots[id]) T;
+    *entity = {};
 
     entity->id = id;
     entity->generation = state->entity_generations[id];
     entity->OnCreate();
+
+    TraceLog(LOG_DEBUG, "Allocate");
 
     return entity;
 }
