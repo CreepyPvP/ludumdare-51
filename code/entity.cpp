@@ -160,8 +160,6 @@ struct Entity
         }
         new_child->next = child;
 
-        assert(new_child->id != child->id);
-
         child = MakeRef<Entity>(new_child);
         child->parent = MakeRef<Entity>(this);
 
@@ -182,11 +180,9 @@ struct Entity
 
                 if (previous) {
                     previous->next = current->next;
-                    assert(previous->id != current->id);
                     current->parent = MakeRef<Entity>(nullptr);
                 } else {
                     child = current->next;
-                    assert(child->id != current->id);
 
                     current->parent = MakeRef<Entity>(nullptr);
                     current->next = MakeRef<Entity>(nullptr);
