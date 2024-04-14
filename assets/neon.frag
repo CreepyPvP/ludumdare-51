@@ -69,5 +69,5 @@ void main()
     float thickness = 0.06;
     float intensity = thickness / d;
     intensity = intensity * intensity * intensity;
-    gl_FragColor = vec4(color * intensity, 1.0);
+    gl_FragColor = vec4(color * intensity, intensity);
 }

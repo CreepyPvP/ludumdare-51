@@ -216,7 +216,7 @@ struct Entity
     void SetParent(Entity *new_parent)
     {
         if (*parent) {
-            RemoveChild(this);
+            parent->RemoveChild(this);
         }
 
         if(new_parent) {
@@ -277,7 +277,6 @@ void DeleteEntity(T *entity)
     if (entity->generation < state->entity_generations[entity->id]) {
         return;
     }
-
 
     entity->OnDestroy();
 

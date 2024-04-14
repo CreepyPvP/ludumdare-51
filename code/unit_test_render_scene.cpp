@@ -12,6 +12,7 @@ struct UnitTestRenderScene : Entity
         unit->local_position = {400, 225};
 
         unit = AllocateEntity<UnitEntity>();
+        unit->appearance = ARCHER;
         PushChild(unit);
         unit->local_position = {700, 225};
     }
@@ -19,13 +20,13 @@ struct UnitTestRenderScene : Entity
     void Update() override
     {
         UnitEntity *unit = (UnitEntity *) *child;
-        if (checked && unit->type == UnityType::HOSTILE)
+        if (checked && unit->team == UnitTeam::HOSTILE)
         {
-            unit->type = UnityType::FRIENDLY;
+            unit->team = UnitTeam::FRIENDLY;
         }
-        else if (!checked && unit->type == UnityType::FRIENDLY)
+        else if (!checked && unit->team == UnitTeam::FRIENDLY)
         {
-            unit->type = UnityType::HOSTILE;
+            unit->team = UnitTeam::HOSTILE;
         }
     }
 
