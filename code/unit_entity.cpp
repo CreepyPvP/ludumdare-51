@@ -8,6 +8,10 @@ struct UnitEntity : Entity
 {
     UnityType type = UnityType::HOSTILE;
     EntityRef<Entity> overall_target{};
+
+    void Render() override {
+        DrawRectangle(-50, -50, 50, 50, BLUE);
+    }
 };
 
 
