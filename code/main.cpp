@@ -43,6 +43,7 @@ struct GameState
 GameState *state;
 
 #include "entity.cpp"
+#include "unit_entity.cpp"
 #include "game_entity.cpp"
 #include "arena.cpp"
 
@@ -50,6 +51,10 @@ union EntitySlot
 {
     Entity base;
     TestEntity test;
+    UnitEntity unit;
+    UnitManagementEntity unitManagementEntity;
+    UnitManagementTestScene unitManagementTestScene;
+    DevelopmentScene developmentScene;
 };
 
 static GameState *create_game_state(void *memory, u64 memory_size)

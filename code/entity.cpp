@@ -199,7 +199,11 @@ struct Entity
             RemoveChild(this);
         }
 
-        parent = MakeRef<Entity>(new_parent);
+        if(new_parent) {
+            new_parent->PushChild(this);
+        } else {
+            parent = {};
+        }
     }
 
     Entity *PopChild()
