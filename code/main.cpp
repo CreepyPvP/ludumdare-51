@@ -134,6 +134,7 @@ i32 main(void)
         // DrawRectangle(500, 200, 200, 200, {0, 0, 255, 255});
 
         EndShaderMode();
+        root->RenderGUI();
         EndDrawing();
     }
 

@@ -110,6 +110,14 @@ struct Entity
             next_target = *next_target->next;
         }
     }
+    virtual void RenderGUI()
+    {
+        Entity *next_target = *child;
+        while (next_target) {
+            next_target->RenderGUI();
+            next_target = *next_target->next;
+        }
+    }
 
     virtual void Render()
     {
