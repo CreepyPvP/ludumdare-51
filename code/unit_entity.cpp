@@ -22,7 +22,7 @@ struct UnitEntity : Entity
 
     void OnRender() override
     {
-        DrawRectangle(-50, -50, 100, 100, BLUE);
+        DrawSprite(-50, -50, 100, 100, BLUE);
     }
 };
 
