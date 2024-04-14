@@ -46,6 +46,10 @@ struct UnitManagementTestScene : Entity
             if(i % 2 == 0) {
                 unit->attack_type = UnitAttackType::RANGED;
                 unit->attack_range = unit->attack_range * 4;
+
+                if(unit->team == UnitTeam::FRIENDLY) {
+                    unit->attack_speed = unit->attack_speed * 0.25f;
+                }
             }
 
             unit->projectile_container = MakeRef<Entity>(projectile_container);
