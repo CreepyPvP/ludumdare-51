@@ -45,14 +45,27 @@ struct UnitEntity : Entity
     float attack_speed = 1;
     float attack_cooldown = 0;
 
+    inline Color GetColor() const {
+        Color color = RED;
+        if (team == FRIENDLY) {
+            if(appearance == TANK) {
+                color = BLUE;
+            } else if(appearance == ARCHER) {
+                color = PURPLE;
+            } else if(appearance == MEDIC) {
+                color = GREEN;
+            } else if(appearance == LIGHT) {
+                color = { 0, 121, 190, 255 };
+            }
+        }
+
+        return color;
+    }
+
 
     void OnRender() override
     {
-        Color color = BLUE;
-        if (team == HOSTILE) {
-            color = RED;
-        }
-        DrawSprite(0, 0, 40, 40, color, appearance);
+        DrawSprite(0, 0, 40, 40, GetColor(), appearance);
     }
 
     void Update() override
@@ -139,7 +152,7 @@ void UnitEntity::TryAttack(UnitEntity *target_unit)
         ProjectileEntity *projectile = AllocateEntity<ProjectileEntity>();
         projectile->local_position = local_position;
         projectile->damage = damage;
-        projectile->color = GREEN;
+        projectile->color = GetColor();
         projectile->speed = projectile_speed;
         projectile->target = MakeRef<UnitEntity>(target_unit);
 

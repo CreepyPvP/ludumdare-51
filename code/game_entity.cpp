@@ -35,14 +35,17 @@ struct UnitManagementTestScene : Entity
                 unit->team = UnitTeam::FRIENDLY;
                 unit->local_position = {800, 0};
                 unit->enemy_detection_range = 999999;
+                unit->appearance = AppearanceType::TANK;
                 unit->move_factor = unit->move_factor * 3;
             } else {
+                unit->appearance = AppearanceType::TANK;
                 unit->team = UnitTeam::HOSTILE;
                 unit->overall_target = MakeRef<Entity>(tesseract);
             }
 
             if(i % 2 == 0) {
                 unit->attack_type = UnitAttackType::RANGED;
+                unit->appearance = AppearanceType::ARCHER;
                 unit->attack_range = unit->attack_range * 4;
 
                 if(unit->team == UnitTeam::FRIENDLY) {
