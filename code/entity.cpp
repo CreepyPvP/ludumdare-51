@@ -238,8 +238,8 @@ T* AllocateEntity()
 
     assert(state->free_entity_count > 0);
 
-    u32 id = state->free_entities[state->free_entity_count];
     state->free_entity_count--;
+    u32 id = state->free_entities[state->free_entity_count];
 
     T *entity = new ((void*) &state->entity_slots[id]) T;
     *entity = {};
