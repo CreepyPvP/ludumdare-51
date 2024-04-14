@@ -34,6 +34,8 @@ struct UnitManagementTestScene : Entity
             if (amount / 2 < i) {
                 unit->type = UnityType::FRIENDLY;
                 unit->local_position = {800, 0};
+                unit->enemy_detection_range = 999999;
+                unit->move_factor = unit->move_factor * 2;
             } else {
                 unit->type = UnityType::HOSTILE;
                 unit->overall_target = MakeRef<Entity>(tesseract);
