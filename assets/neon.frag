@@ -73,13 +73,11 @@ void main()
         float a = line(pos, vec2(-0.5, -0.5), vec2(0.5, -0.5), 0.0);
         float b = line(pos, vec2(0.5, -0.5), vec2(0.5, 0.5), 0.0);
         float c = line(pos, vec2(-0.5, -0.5), vec2(-0.5, 0.5), 0.0);
-        //float e = line(pos, vec2(-0.5, 0.5), vec2(0.5, 0.5), 0.0);
-        float f = line(pos, vec2(0.25, 0.25), vec2(0.25, 0.5), 0.0);
+        float e = line(pos, vec2(-0.5, 0.5), vec2(0.5, 0.5), 0.0);
 
         d = min(a, b);
         d = min(d, c);
-        //d = min(d, e);
-        d = min(d, f);
+        d = min(d, e);
     }
 
     // cross
