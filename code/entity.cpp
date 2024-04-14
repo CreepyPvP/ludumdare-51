@@ -147,8 +147,9 @@ struct Entity
         flags = flags | EntityStateFlag::TO_BE_DESTROYED;
         Entity *next_target = *child;
         while (next_target != nullptr) {
-            next_target->OnDestroy();
+            Entity *current = next_target;
             next_target = *next_target->next;
+            DeleteEntity(current);
         }
     }
 
@@ -191,7 +192,7 @@ struct Entity
             }
 
             previous = current;
-            current = *child->next;
+            current = *current->next;
         }
 
     }
@@ -247,6 +248,7 @@ T* AllocateEntity()
 template<typename T>
 void DeleteEntity(T *entity)
 {
+    if(entity->flags & ~EntityStateFlag::TO_BE_DESTROYED) return;
     if (entity->generation < state->entity_generations[entity->id]) {
         return;
     }

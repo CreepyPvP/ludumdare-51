@@ -7,6 +7,7 @@ enum UnityType
 struct UnitEntity : Entity
 {
     UnityType type = UnityType::HOSTILE;
+    EntityRef<Entity> overall_target{};
 };
 
 
@@ -19,8 +20,6 @@ struct UnitManagementEntity : Entity
     float attack_range = 5;
     float attack_merge_range = 5;
 
-
-    EntityRef<Entity> overall_target{};
 
     void Update() override
     {
@@ -83,8 +82,8 @@ struct UnitManagementEntity : Entity
 
                 current_target->local_position.x += delta.x * move_factor * GetFrameTime();
                 current_target->local_position.y += delta.y * move_factor * GetFrameTime();
-            } else if(*overall_target) {
-                Vector3 delta = Vector3Subtract(current_target->local_position, overall_target->local_position);
+            } else if(*current_target->overall_target) {
+                Vector3 delta = Vector3Subtract(current_target->local_position, current_target->overall_target->local_position);
                 float dist = Vector3LengthSqr(delta);
 
                 if(dist < attack_merge_range) {

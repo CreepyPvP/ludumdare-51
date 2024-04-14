@@ -87,12 +87,9 @@ i32 main(void)
     state = create_game_state(memory, memory_size);
 
     Entity *root = AllocateEntity<Entity>();
-    TestEntity *child_a = AllocateEntity<TestEntity>();
-    Entity *child_b = AllocateEntity<Entity>();
+    DevelopmentScene *development_scene = AllocateEntity<DevelopmentScene>();
 
-    root->PushChild(child_b);
-    child_b->local_position = {0, 0};
-    child_b->PushChild(child_a);
+    root->PushChild(development_scene);
 
 
     InitWindow(screen_width, screen_height, "Title...");
