@@ -145,8 +145,8 @@ i32 main(void)
         ClearBackground(BLACK);
         BeginDrawing();
 
-        // static bool checked = true;
-        // GuiCheckBox((Rectangle){ 25, 108, 15, 15 }, "hello world", &checked);
+        static bool checked = true;
+        GuiCheckBox((Rectangle){ 25, 108, 15, 15 }, "hello world", &checked);
 
         BeginShaderMode(neon_shader);
 
