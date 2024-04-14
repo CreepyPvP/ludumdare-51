@@ -23,6 +23,8 @@ struct UnitManagementTestScene : Entity
         Entity *unit_management = AllocateEntity<UnitManagementEntity>();
         Entity *tesseract = AllocateEntity<Entity>();
 
+        tesseract->local_position = {400, 225};
+
         TraceLog(LOG_INFO, "CREATED");
 
         u32 amount = 10;

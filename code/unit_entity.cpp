@@ -19,7 +19,7 @@ struct UnitManagementEntity : Entity
 {
 
     float avoid_factor = 0.1;
-    float move_factor = 0.2;
+    float move_factor = 10;
     float protection_distance = 40;
     float attack_range = 5;
     float attack_merge_range = 5;
