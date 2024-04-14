@@ -48,6 +48,31 @@ struct GameState
 
 GameState *state;
 
+void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color)
+{
+
+    rlBegin(RL_QUADS);
+
+    rlNormal3f(0.0f, 0.0f, 1.0f);
+    rlColor4ub(color.r, color.g, color.b, color.a);
+
+    rlTexCoord2f(0, 1);
+    rlVertex2f(x - width / 2, y - height / 2);
+
+    rlTexCoord2f(0, 0);
+    rlVertex2f(x - width / 2, y + height / 2);
+
+    rlTexCoord2f(1, 0);
+    rlVertex2f(x + width / 2, y + height / 2);
+
+    rlTexCoord2f(1, 1);
+    rlVertex2f(x + width / 2, y - height / 2);
+
+    rlEnd();
+
+    rlSetTexture(0);
+}
+
 #include "entity.cpp"
 #include "unit_entity.cpp"
 #include "unit_test_render_scene.cpp"
@@ -73,31 +98,6 @@ static GameState *create_game_state(void *memory, u64 memory_size)
     }
 
     return state;
-}
-
-void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color)
-{
-
-    rlBegin(RL_QUADS);
-
-        rlNormal3f(0.0f, 0.0f, 1.0f);
-        rlColor4ub(color.r, color.g, color.b, color.a);
-
-        rlTexCoord2f(0, 1);
-        rlVertex2f(x - width / 2, y - height / 2);
-
-        rlTexCoord2f(0, 0);
-        rlVertex2f(x - width / 2, y + height / 2);
-
-        rlTexCoord2f(1, 0);
-        rlVertex2f(x + width / 2, y + height / 2);
-
-        rlTexCoord2f(1, 1);
-        rlVertex2f(x + width / 2, y - height / 2);
-
-    rlEnd();
-
-    rlSetTexture(0);
 }
 
 i32 main(void)
@@ -145,15 +145,12 @@ i32 main(void)
         ClearBackground(BLACK);
         BeginDrawing();
 
-        static bool checked = true;
-        GuiCheckBox((Rectangle){ 25, 108, 15, 15 }, "hello world", &checked);
+        // static bool checked = true;
+        // GuiCheckBox((Rectangle){ 25, 108, 15, 15 }, "hello world", &checked);
 
         BeginShaderMode(neon_shader);
 
         root->Render();
-        DrawSprite(200, 240, 100, 100, BLUE);
-        DrawSprite(400, 240, 100, 100, GREEN);
-        DrawSprite(600, 240, 100, 100, RED);
 
         EndShaderMode();
         root->RenderGUI();
