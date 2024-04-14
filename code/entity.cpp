@@ -146,7 +146,7 @@ struct Entity
 
         flags = flags | EntityStateFlag::TO_BE_DESTROYED;
         Entity *next_target = *child;
-        while (next_target != nullptr) {
+        while (next_target) {
             Entity *current = next_target;
             next_target = *next_target->next;
             DeleteEntity(current);
@@ -227,22 +227,32 @@ EntityRef<T> MakeRef(Entity *target)
 template<typename T>
 T* AllocateEntity()
 {
-    TraceLog(LOG_INFO, "INSTANTIATE");
+    if (sizeof(T) > sizeof(EntitySlot)) {
+        TraceLog(LOG_ERROR, "Sizeof Entity [%u] exceeds Sizeof EntitySlot [%u]\n", sizeof(T), sizeof(EntitySlot));
+        assert(0);
+    }
+
+    assert(state->free_entity_count > 0);
+
     u32 id = state->free_entities[state->free_entity_count];
     state->free_entity_count--;
 
-    T *entity = new ((void*) (state->entity_slots + id)) T;
+    T *entity = new ((void*) &state->entity_slots[id]) T;
 
     entity->id = id;
     entity->generation = state->entity_generations[id];
     entity->OnCreate();
+
     return entity;
 }
 
 template<typename T>
 void DeleteEntity(T *entity)
 {
-    if(entity->flags & EntityStateFlag::TO_BE_DESTROYED) return;
+    if(entity->flags & EntityStateFlag::TO_BE_DESTROYED) {
+        return;
+    };
+
     if (entity->generation < state->entity_generations[entity->id]) {
         return;
     }

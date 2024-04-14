@@ -3,6 +3,9 @@
 #include "raymath.h"
 #include "utils.h"
 
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
+
 #include <stdio.h>
 #include <assert.h>
 #include <stdint.h>
@@ -27,7 +30,10 @@ typedef double f64;
 
 #include "arena.h"
 
-union EntitySlot;
+struct EntitySlot
+{
+    char buffer[128];
+};
 
 struct GameState
 {
@@ -46,16 +52,6 @@ GameState *state;
 #include "unit_entity.cpp"
 #include "game_entity.cpp"
 #include "arena.cpp"
-
-union EntitySlot
-{
-    Entity base;
-    TestEntity test;
-    UnitEntity unit;
-    UnitManagementEntity unitManagementEntity;
-    UnitManagementTestScene unitManagementTestScene;
-    DevelopmentScene developmentScene;
-};
 
 static GameState *create_game_state(void *memory, u64 memory_size)
 {
@@ -122,6 +118,9 @@ i32 main(void)
         root->Update();
         ClearBackground(BLACK);
         BeginDrawing();
+
+        static bool checked = true;
+        GuiCheckBox((Rectangle){ 25, 108, 15, 15 }, "hello world", &checked);
 
         BeginShaderMode(neon_shader);
 
