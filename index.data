@@ -33,11 +33,12 @@ vec2 distort_pos(vec2 pos)
 void main()
 {
     vec2 pos = 2 * uv - vec2(1);
-    vec2 dist = distort_pos(pos);
+    //vec2 dist = distort_pos(pos);
+    vec2 dist = pos;
     // NOTE: From 1 to 0
 
     float d = circle(dist, vec2(0, 0), 0.8);
-    d = min(d, line(dist, vec2(-0.8, 0), vec2(0.8, 0), 0));
+    //d = min(d, line(dist, vec2(-0.8, 0), vec2(0.8, 0), 0));
 
     float thickness = 0.06;
     float intensity = thickness / d;
