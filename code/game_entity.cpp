@@ -64,6 +64,15 @@ struct DevelopmentScene : Entity
 
             new_child->SetParent(this);
         }
+        if (IsKeyPressed(KEY_F2)) {
+            Entity *old_child = *child;
+            if (old_child) {
+                DeleteEntity(old_child);
+            }
+            Entity *new_child = AllocateEntity<UnitTestRenderScene>();
+
+            new_child->SetParent(this);
+        }
     }
 };
 

@@ -50,6 +50,7 @@ GameState *state;
 
 #include "entity.cpp"
 #include "unit_entity.cpp"
+#include "unit_test_render_scene.cpp"
 #include "game_entity.cpp"
 #include "arena.cpp"
 
@@ -97,7 +98,7 @@ i32 main(void)
 
     SetShapesTexture({}, {});
 
-    DisableCursor();
+    // DisableCursor();
     SetTargetFPS(60);
 
     // i32 size;
