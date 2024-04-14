@@ -10,6 +10,10 @@ struct UnitTestRenderScene : Entity
         UnitEntity *unit = AllocateEntity<UnitEntity>();
         PushChild(unit);
         unit->local_position = {400, 225};
+
+        unit = AllocateEntity<UnitEntity>();
+        PushChild(unit);
+        unit->local_position = {700, 225};
     }
 
     void Update() override

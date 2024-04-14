@@ -39,6 +39,9 @@ struct GameState
 {
     Arena arena;
 
+    Shader neon_shader;
+    i32 entity_type_loc;
+
     u32 entity_cap;
     EntitySlot *entity_slots;
     u32 *entity_generations;
@@ -48,7 +51,7 @@ struct GameState
 
 GameState *state;
 
-void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color)
+void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, i32 type)
 {
 
     rlBegin(RL_QUADS);
@@ -69,8 +72,10 @@ void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color)
     rlVertex2f(x + width / 2, y - height / 2);
 
     rlEnd();
-
     rlSetTexture(0);
+
+    SetShaderValue(state->neon_shader, state->entity_type_loc, &type, SHADER_UNIFORM_INT);
+    rlDrawRenderBatchActive();
 }
 
 #include "entity.cpp"
@@ -131,15 +136,16 @@ i32 main(void)
     // printf("Got string: %s\n", file);
     // UnloadFileData(file);
 
-    Shader neon_shader = LoadShader("assets/neon.vert", "assets/neon.frag");
+    state->neon_shader = LoadShader("assets/neon.vert", "assets/neon.frag");
 
-    i32 seconds_loc = GetShaderLocation(neon_shader, "seconds");
+    i32 seconds_loc = GetShaderLocation(state->neon_shader, "seconds");
+    state->entity_type_loc = GetShaderLocation(state->neon_shader, "entity_type");
 
     f32 seconds = 0;
 
     while (!WindowShouldClose()) {
         seconds += GetFrameTime();
-        SetShaderValue(neon_shader, seconds_loc, &seconds, SHADER_UNIFORM_FLOAT);
+        SetShaderValue(state->neon_shader, seconds_loc, &seconds, SHADER_UNIFORM_FLOAT);
 
         root->Update();
         ClearBackground(BLACK);
@@ -148,7 +154,7 @@ i32 main(void)
         // static bool checked = true;
         // GuiCheckBox((Rectangle){ 25, 108, 15, 15 }, "hello world", &checked);
 
-        BeginShaderMode(neon_shader);
+        BeginShaderMode(state->neon_shader);
 
         root->Render();
 
