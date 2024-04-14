@@ -23,9 +23,8 @@ struct UnitManagementTestScene : Entity
         Entity *unit_management = AllocateEntity<UnitManagementEntity>();
         Entity *tesseract = AllocateEntity<Entity>();
 
-        tesseract->local_position = {400, 225};
+        tesseract->local_position = {(float) state->screen_width/2.0f, (float) state->screen_height/2.0f};
 
-        TraceLog(LOG_INFO, "CREATED");
 
         u32 amount = 10;
         for (int i = 0; i < amount; ++i) {
@@ -35,11 +34,14 @@ struct UnitManagementTestScene : Entity
                 unit->type = UnityType::FRIENDLY;
                 unit->local_position = {800, 0};
                 unit->enemy_detection_range = 999999;
-                unit->move_factor = unit->move_factor * 2;
+                unit->move_factor = unit->move_factor * 3;
             } else {
                 unit->type = UnityType::HOSTILE;
                 unit->overall_target = MakeRef<Entity>(tesseract);
             }
+
+            TraceLog(LOG_INFO, "Spawn unit %d(%d)", unit->type, unit->id);
+
 
             unit_management->PushChild(unit);
         }

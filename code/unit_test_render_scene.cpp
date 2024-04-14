@@ -9,7 +9,7 @@ struct UnitTestRenderScene : Entity
 
         UnitEntity *unit = AllocateEntity<UnitEntity>();
         PushChild(unit);
-        unit->local_position = {400, 225};
+        unit->local_position = {(float) state->screen_width/2.0f, (float) state->screen_height/2.0f};
     }
 
     void Update() override

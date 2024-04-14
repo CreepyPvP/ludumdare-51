@@ -44,6 +44,9 @@ struct GameState
     u32 *entity_generations;
     u32 free_entity_count;
     u32 *free_entities;
+
+    i32 screen_width;
+    i32 screen_height;
 };
 
 GameState *state;
@@ -87,6 +90,8 @@ static GameState *create_game_state(void *memory, u64 memory_size)
     GameState *state = PushStruct(&pre.arena, GameState);
     *state = pre;
 
+    state->screen_width = 1600;
+    state->screen_height = 900;
     state->entity_cap = 100;
     state->entity_slots = PushArray(&state->arena, EntitySlot, state->entity_cap);
     state->entity_generations = PushArray(&state->arena, u32, state->entity_cap);
@@ -104,9 +109,6 @@ i32 main(void)
 {
     SetTraceLogLevel(LOG_DEBUG);
 
-    i32 screen_width = 800;
-    i32 screen_height = 450;
-
     u64 memory_size = Megabytes(1);
     void *memory = malloc(memory_size);
 
@@ -118,7 +120,7 @@ i32 main(void)
     root->PushChild(development_scene);
 
 
-    InitWindow(screen_width, screen_height, "Title...");
+    InitWindow(state->screen_width, state->screen_height, "Title...");
     InitAudioDevice();
 
     SetShapesTexture({}, {});
