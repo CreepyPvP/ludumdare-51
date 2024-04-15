@@ -48,7 +48,8 @@ struct CardEntity : Entity
         place_sfx = LoadSound("assets/cards_place_down_2.wav");
     }
 
-    void OnEnable() override {
+    void OnEnable() override
+    {
         Entity::OnEnable();
 
         local_position = {state->screen_width + (float) CARD_WIDTH_H + 5, -CARD_HEIGHT_H - 5};
@@ -281,14 +282,15 @@ struct CardScene : Entity
         AutoLayout();
     }
 
-    void AutoLayout() {
+    void AutoLayout()
+    {
 
         CardEntity *next_target = (CardEntity *) *child;
         i32 index = 0;
         float x_base = ((float) state->screen_width / 2) - ((float) child_count / 2.0f) * CARD_WIDTH;
         while (next_target) {
 
-            next_target->start_position = { x_base + CARD_WIDTH * index, (float) state->screen_height + 40};
+            next_target->start_position = {x_base + CARD_WIDTH * index, (float) state->screen_height + 40};
 
             index++;
             next_target = (CardEntity *) *next_target->next;
@@ -296,10 +298,11 @@ struct CardScene : Entity
     }
 
 
-    void Update() override {
+    void Update() override
+    {
         Entity::Update();
 
-        if(IsKeyPressed(KEY_F)) {
+        if (IsKeyPressed(KEY_F)) {
             CardEntity *card = AllocateEntity<CardEntity>();
             card->spawner_ref = spawner_ref;
             card->unitData = {

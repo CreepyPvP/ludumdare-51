@@ -13,6 +13,7 @@ struct GameWorld : Entity
         Entity *projectile_container = AllocateEntity<Entity>();
 
         tesseract->local_position = {(float) state->screen_width / 2.0f, (float) state->screen_height / 2.0f};
+        tesseract->health = 20;
 
         PushChild(projectile_container);
         PushChild(unit_management);

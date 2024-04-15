@@ -20,10 +20,14 @@ struct TesseractEntity : Entity
 {
 
     u32 damage_sfx_counter;
+    u32 health;
 
     void OnRender() override
     {
-        DrawSprite(0, 0, 40, 40, ORANGE, AppearanceType::TESSERACT, 0);
+        DrawSprite(0, 0, 40 * 3, 40 * 3, ORANGE, AppearanceType::TESSERACT, 0);
+        const char *text = TextFormat("%d", health);
+        DrawText(text, -MeasureText(text, 20) / 2, -10, 20, RED);
+
     }
 
     void Damage(u32 damage)
@@ -31,6 +35,12 @@ struct TesseractEntity : Entity
         PlaySound(state->tesseract_damaged_sound[damage_sfx_counter]);
 
         damage_sfx_counter = (damage_sfx_counter + 1) % 3;
+
+        if (health <= damage) {
+            health = 0;
+            return;
+        }
+        health -= damage;
     }
 
 };
@@ -346,8 +356,6 @@ struct UnitManagementEntity : Entity
 
             close_dx += delta.x;
             close_dy += delta.y;
-
-
 
 
             other_target = (UnitEntity *) *other_target->next;
