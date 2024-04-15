@@ -22,7 +22,18 @@ enum AppearanceType
     ARCHER,
     TANK,
     MEDIC,
-    PROJECTILE
+    PROJECTILE,
+    TESSERACT
+};
+
+struct TesseractEntity : Entity {
+    void OnRender() override {
+        DrawSprite(0, 0, 40, 40, ORANGE, AppearanceType::TESSERACT);
+    }
+
+    void Damage(u32 damage) {
+
+    }
 };
 
 struct UnitEntity : Entity
@@ -32,7 +43,7 @@ struct UnitEntity : Entity
     TargetingType targeting_type;
     AppearanceType appearance;
 
-    EntityRef<Entity> overall_target{};
+    EntityRef<TesseractEntity> overall_target{};
     EntityRef<Entity> projectile_container{};
 
 
@@ -366,9 +377,9 @@ void ConfigureFriendly(UnitEntity* unit) {
 
     unit->protection_distance = 40;
 }
-void ConfigureHostile(UnitEntity* unit, Entity* tesseract) {
+void ConfigureHostile(UnitEntity* unit, TesseractEntity* tesseract) {
     unit->team = UnitTeam::HOSTILE;
-    unit->overall_target = MakeRef<Entity>(tesseract);
+    unit->overall_target = MakeRef<TesseractEntity>(tesseract);
 
     unit->enemy_detection_range = 100;
     unit->move_factor = 35;
