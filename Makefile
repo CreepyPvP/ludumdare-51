@@ -73,7 +73,7 @@ all: build
 prepare_zip: $(DIST_OUT)/release.zip
 
 upload: $(DIST_OUT)/release.zip
-	butler push $(DIST_OUT)/release.zip gerolmed/internal-test-project:$(PLAT_ID)
+	butler push $(DIST_OUT)/release.zip gerolmed/summoner-defence-forces:$(PLAT_ID)
 
 clean:
 	rm -rf output
