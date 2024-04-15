@@ -21,11 +21,11 @@ struct UnitTestRenderScene : Entity
         Entity::Update();
 
         UnitEntity *unit = (UnitEntity *) *child;
-        if (checked && unit->team == UnitTeam::HOSTILE)
+        if (checked && unit->team == HOSTILE)
         {
-            unit->team = UnitTeam::FRIENDLY;
+            unit->team = FRIENDLY;
         }
-        else if (!checked && unit->team == UnitTeam::FRIENDLY)
+        else if (!checked && unit->team == FRIENDLY)
         {
             unit->team = UnitTeam::HOSTILE;
         }
