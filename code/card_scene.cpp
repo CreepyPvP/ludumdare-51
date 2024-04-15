@@ -62,7 +62,7 @@ struct SummonCardEntity : Entity {
     bool is_locked = false;
     bool is_on_cooldown = false;
 
-    float max_cooldown = 5;
+    float max_cooldown = 15;
     float cooldown;
 
     UnitData unitData;
@@ -273,11 +273,26 @@ struct ShopCardEntity : Entity {
 
     UnitData new_unit_data;
     EntityRef <CardScene> card_scene;
+    EntityRef <UnitEntity> preview_unit_ref;
 
     Vector3 start_position;
 
     void OnCreate() override {
         local_position = {(float) state->screen_width / 2, -CARD_HEIGHT_H - 20};
+    }
+
+    void OnEnable() override {
+        Entity::OnEnable();
+
+        if(type == ShopType_Summon) {
+            UnitEntity *preview = AllocateEntity<UnitEntity>();
+            preview->is_fake = true;
+            preview->local_position = {0, 15.0f - CARD_WIDTH_H};
+            preview->local_scale = {3, 3, 1};
+            ConfigureFromData(preview, new_unit_data, nullptr);
+            PushChild(preview);
+            preview_unit_ref = MakeRef<UnitEntity>(preview);
+        }
     }
 
 
@@ -299,6 +314,32 @@ struct ShopCardEntity : Entity {
         Rectangle card_shape = {-CARD_WIDTH_H, -CARD_HEIGHT_H, CARD_WIDTH, CARD_HEIGHT};
         DrawRectangleRounded(card_shape, 0.2f, 1, BLACK);
         DrawRectangleRoundedLines(card_shape, 0.2f, 1, 4, WHITE);
+
+        if(type == ShopType_Summon) {
+            const char *text;
+            switch (preview_unit_ref->appearance) {
+                case LIGHT:
+                    text = "Light";
+                    break;
+                case ARCHER:
+                    text = "Archer";
+                    break;
+                case TANK:
+                    text = "Tank";
+                    break;
+                case MEDIC:
+                    text = "Medic";
+                    break;
+                default:
+                    text = "None";
+                    break;
+            }
+
+
+            int text_width = MeasureText(text, 30);
+            DrawText(text, -text_width / 2, -CARD_WIDTH_H - 55, 30, WHITE);
+        }
+
     }
 
 
