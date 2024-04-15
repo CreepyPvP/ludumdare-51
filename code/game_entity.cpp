@@ -27,7 +27,7 @@ struct UnitManagementTestScene : Entity
         tesseract->local_position = {(float) state->screen_width / 2.0f, (float) state->screen_height / 2.0f};
 
 
-        u32 amount = 10;
+        u32 amount = 31;
         for (int i = 0; i < amount; ++i) {
             UnitEntity *unit = AllocateEntity<UnitEntity>();
 
@@ -47,10 +47,14 @@ struct UnitManagementTestScene : Entity
                 unit->attack_type = UnitAttackType::RANGED;
                 unit->appearance = AppearanceType::ARCHER;
                 unit->attack_range = unit->attack_range * 4;
+            } else if (i % 3 == 0) {
+                unit->attack_type = UnitAttackType::RANGED;
+                unit->appearance = AppearanceType::MEDIC;
+                unit->attack_range = unit->attack_range * 4;
 
-                if(unit->team == UnitTeam::FRIENDLY) {
-                    unit->attack_speed = unit->attack_speed * 0.25f;
-                }
+                unit->targeting_type = TargetingType::TEAM;
+                unit->prioritize_execute = true;
+                unit->prioritized_range = unit->attack_range * 2;
             }
 
             unit->projectile_container = MakeRef<Entity>(projectile_container);

@@ -10,6 +10,12 @@ enum UnitAttackType
     RANGED
 };
 
+enum TargetingType
+{
+    ENEMY,
+    TEAM
+};
+
 enum AppearanceType
 {
     LIGHT,
@@ -23,6 +29,7 @@ struct UnitEntity : Entity
 {
     UnitTeam team;
     UnitAttackType attack_type;
+    TargetingType targeting_type;
     AppearanceType appearance;
 
     EntityRef<Entity> overall_target{};
@@ -38,24 +45,30 @@ struct UnitEntity : Entity
     float attack_range = 25;
     float projectile_speed = 150;
 
+    // Attacks lowest HP enemy in prio range
+    bool prioritize_execute;
+    float prioritized_range = 25;
+
     float attack_merge_range = 5;
     u32 damage = 3;
 
     u32 health = 10;
+    u32 max_health = 10;
     float attack_speed = 1;
     float attack_cooldown = 0;
 
-    inline Color GetColor() const {
+    inline Color GetColor() const
+    {
         Color color = RED;
         if (team == FRIENDLY) {
-            if(appearance == TANK) {
+            if (appearance == TANK) {
                 color = BLUE;
-            } else if(appearance == ARCHER) {
+            } else if (appearance == ARCHER) {
                 color = PURPLE;
-            } else if(appearance == MEDIC) {
+            } else if (appearance == MEDIC) {
                 color = GREEN;
-            } else if(appearance == LIGHT) {
-                color = { 0, 121, 190, 255 };
+            } else if (appearance == LIGHT) {
+                color = {0, 121, 190, 255};
             }
         }
 
@@ -89,14 +102,26 @@ struct UnitEntity : Entity
         }
         health -= damage_received;
     }
+    void Heal(u32 damage_received)
+    {
+        health += damage_received;
+        if (health <= max_health) return;
+        health = max_health;
+    }
 
     void TryAttack(UnitEntity *target_unit);
+
+    float GetHealthPercentage() const
+    {
+        return (float) health / (float) max_health;
+    }
 };
 
 struct ProjectileEntity : Entity
 {
     EntityRef<UnitEntity> target{};
     float speed = 100;
+    TargetingType targeting_type;
     u32 damage = 3;
     Color color = BLUE;
 
@@ -105,14 +130,14 @@ struct ProjectileEntity : Entity
     void Update() override
     {
         UnitEntity *target_ref = *target;
-        if(!target_ref) {
+        if (!target_ref) {
             DeleteEntity(this);
             return;
         }
 
         Vector3 delta = Vector3Subtract(target_ref->local_position, local_position);
         float combinedDistance = hitRange + target_ref->protection_distance / 2.0f;
-        if(Vector3LengthSqr(delta) < combinedDistance * combinedDistance) {
+        if (Vector3LengthSqr(delta) < combinedDistance * combinedDistance) {
             HitTarget();
             return;
         }
@@ -131,26 +156,42 @@ struct ProjectileEntity : Entity
 
     void HitTarget()
     {
-        target->Damage(damage);
+        if(targeting_type == ENEMY) {
+            target->Damage(damage);
+        } else {
+            target->Heal(damage);
+        }
         DeleteEntity(this);
     }
+
 };
 
 
 void UnitEntity::TryAttack(UnitEntity *target_unit)
 {
+    if(targeting_type == TargetingType::TEAM && target_unit->GetHealthPercentage() >= 1) {
+        return;
+    }
+
     if (this->attack_cooldown > 0) return;
 
     if (attack_type == UnitAttackType::MELEE) {
         this->attack_cooldown = this->attack_speed;
-        target_unit->Damage(this->damage);
-        TraceLog(LOG_INFO, "Attack %d(%d) -> %d(%d) for %d. Remaining %d", this->team, this->id, target_unit->team,
-                 target_unit->id, this->damage, target_unit->health);
+        if(targeting_type == TargetingType::ENEMY) {
+            target_unit->Damage(this->damage);
+            TraceLog(LOG_INFO, "Attack %d(%d) -> %d(%d) for %d. Remaining %d", this->team, this->id, target_unit->team,
+                     target_unit->id, this->damage, target_unit->health);
+        } else {
+            target_unit->Heal(this->damage);
+            TraceLog(LOG_INFO, "Heal %d(%d) -> %d(%d) for %d. Remaining %d", this->team, this->id, target_unit->team,
+                     target_unit->id, this->damage, target_unit->health);
+        }
     } else if (attack_type == UnitAttackType::RANGED) {
         this->attack_cooldown = this->attack_speed;
 
         ProjectileEntity *projectile = AllocateEntity<ProjectileEntity>();
         projectile->local_position = local_position;
+        projectile->targeting_type = targeting_type;
         projectile->damage = damage;
         projectile->color = GetColor();
         projectile->speed = projectile_speed;
@@ -184,6 +225,12 @@ struct UnitManagementEntity : Entity
     {
         UnitEntity *closest_enemy = nullptr;
         float closest_enemy_dist = -1;
+        UnitEntity *priority_enemy = nullptr;
+        float priority_enemy_dist = -1;
+
+        // In percentage
+        float priority_enemy_health = 1;
+
         float close_dx = 0;
         float close_dy = 0;
 
@@ -191,6 +238,7 @@ struct UnitManagementEntity : Entity
         float avoid_factor = current_target->move_factor;
         float move_factor = current_target->move_factor;
         float enemy_detection_range = current_target->enemy_detection_range;
+        float prioritized_range = current_target->prioritized_range;
         float protection_distance = current_target->protection_distance;
         float attack_range = current_target->attack_range;
         float attack_merge_range = current_target->attack_merge_range;
@@ -205,27 +253,26 @@ struct UnitManagementEntity : Entity
 
 
             Vector3 delta = Vector3Subtract(current_target->local_position, other_target->local_position);
-            if (other_target->team != current_target->team) {
+            // Select attack target follow
+            if (current_target->targeting_type == TargetingType::ENEMY == other_target->team != current_target->team) {
+
 
                 float distanceSqr = Vector3LengthSqr(delta);
-                if (distanceSqr > (enemy_detection_range * enemy_detection_range)) {
-                    other_target = (UnitEntity *) *other_target->next;
-                    continue;
-                }
-                if (closest_enemy && distanceSqr > closest_enemy_dist) {
-                    other_target = (UnitEntity *) *other_target->next;
-                    continue;
-                }
-                closest_enemy_dist = distanceSqr;
-                closest_enemy = other_target;
 
+                if(current_target->targeting_type != TargetingType::TEAM || current_target->appearance != other_target->appearance) {
+                    HandleNormalAttackCheck(distanceSqr, enemy_detection_range, closest_enemy_dist, closest_enemy,
+                                            other_target);
+                }
+
+                if (current_target->prioritize_execute) {
+                    HandlePriorityAttackCheck(distanceSqr, prioritized_range, priority_enemy_dist, priority_enemy_health, priority_enemy, other_target);
+                }
 
                 other_target = (UnitEntity *) *other_target->next;
                 continue;
             }
 
             // Add push away from nearby friendly unit
-
             if (Vector3LengthSqr(delta) > (protection_distance * protection_distance)) {
                 other_target = (UnitEntity *) *other_target->next;
                 continue;
@@ -237,6 +284,11 @@ struct UnitManagementEntity : Entity
 
             other_target = (UnitEntity *) *other_target->next;
         }
+
+        if(priority_enemy) {
+            closest_enemy = priority_enemy;
+        }
+
 
         if (closest_enemy) {
             Vector3 delta = Vector3Subtract(closest_enemy->local_position, current_target->local_position);
@@ -271,5 +323,36 @@ struct UnitManagementEntity : Entity
         Vector2 deltaNorm = Vector2Normalize({close_dx, close_dy});
         current_target->local_position.x += deltaNorm.x * avoid_factor * GetFrameTime();
         current_target->local_position.y += deltaNorm.y * avoid_factor * GetFrameTime();
+    }
+
+    static void HandlePriorityAttackCheck(float distanceSqr, float prioritized_range, float &priority_enemy_dist, float &priority_enemy_health, UnitEntity *&priority_enemy, UnitEntity *other_target) {
+        if (distanceSqr > (prioritized_range * prioritized_range)) {
+            return;
+        }
+        float health_perc = other_target->GetHealthPercentage();
+
+        if(!priority_enemy) {
+            if(health_perc >= 1) return;
+            priority_enemy = other_target;
+            priority_enemy_health = health_perc;
+            priority_enemy_dist = distanceSqr;
+            return;
+        }
+
+        if(health_perc > priority_enemy_health) return;
+        priority_enemy = other_target;
+        priority_enemy_health = health_perc;
+        priority_enemy_dist = distanceSqr;
+    }
+
+    static void HandleNormalAttackCheck(float distanceSqr, float enemy_detection_range, float &closest_enemy_dist, UnitEntity *&closest_enemy, UnitEntity *other_target) {
+        if (distanceSqr > (enemy_detection_range * enemy_detection_range)) {
+            return;
+        }
+        if (closest_enemy && distanceSqr > closest_enemy_dist) {
+            return;
+        }
+        closest_enemy_dist = distanceSqr;
+        closest_enemy = other_target;
     }
 };
