@@ -161,7 +161,6 @@ void load_game_audio(GameState *state)
     SetMasterVolume(0.15f);
     state->base_layer = LoadMusicStream("assets/Gameplay_base_layer.wav");
 
-    PlayMusicStream(state->base_layer);
 
     state->unit_music[LIGHT] = LoadMusicStream("assets/Melee_summoned_music.wav");
     state->unit_music[ARCHER] = LoadMusicStream("assets/Range_summoned_music.wav");
@@ -172,6 +171,9 @@ void load_game_audio(GameState *state)
     state->unit_summoned_sound[ARCHER] = LoadSound("assets/Range_summon.wav");
     state->unit_summoned_sound[TANK] = LoadSound("assets/tank_summon.wav");
     state->unit_summoned_sound[MEDIC] = LoadSound("assets/medic_summon.wav");
+
+    PlayMusicStream(state->base_layer);
+    SetMusicVolume(state->base_layer, 0.3);
 
     for (u32 i = 0; i < UNIT_TYPE_COUNT; ++i) {
         if (!IsMusicReady(state->unit_music[i])) {
@@ -235,7 +237,7 @@ i32 main(void)
                 continue;
             }
 
-            float volume = fmin((float) state->alive_units[i] / (float) state->max_units[i], 1);
+            float volume = fmin((float) state->alive_units[i] / (float) state->max_units[i], 1) * 0.5;
             UpdateMusicStream(state->unit_music[i]);
             SetMusicVolume(state->unit_music[i], volume);
         }
