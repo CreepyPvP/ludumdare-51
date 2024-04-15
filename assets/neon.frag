@@ -34,7 +34,7 @@ vec2 distort_pos(vec2 pos)
 
 void main()
 {
-    vec2 pos = 2.0 * uv - vec2(1.0);
+    vec2 pos = distort_pos(2.0 * uv - vec2(1.0));
     float d = 0.0;
     // NOTE: From 1 to 0
 

@@ -57,6 +57,8 @@ GameState *state;
 void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, i32 type)
 {
 
+    BeginShaderMode(state->neon_shader);
+
     rlBegin(RL_QUADS);
 
     rlNormal3f(0.0f, 0.0f, 1.0f);
@@ -79,11 +81,14 @@ void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, i32 type)
 
     SetShaderValue(state->neon_shader, state->entity_type_loc, &type, SHADER_UNIFORM_INT);
     rlDrawRenderBatchActive();
+
+    EndShaderMode();
 }
 
 #include "entity.cpp"
 #include "unit_entity.cpp"
 #include "unit_test_render_scene.cpp"
+#include "card_scene.cpp"
 #include "game_entity.cpp"
 #include "arena.cpp"
 
@@ -147,6 +152,7 @@ i32 main(void)
 
     while (!WindowShouldClose()) {
         seconds += GetFrameTime();
+
         SetShaderValue(state->neon_shader, seconds_loc, &seconds, SHADER_UNIFORM_FLOAT);
 
         root->Update();
@@ -156,12 +162,9 @@ i32 main(void)
         // static bool checked = true;
         // GuiCheckBox((Rectangle){ 25, 108, 15, 15 }, "hello world", &checked);
 
-        BeginShaderMode(state->neon_shader);
-
         root->Render();
-
-        EndShaderMode();
         root->RenderGUI();
+
         EndDrawing();
     }
 
