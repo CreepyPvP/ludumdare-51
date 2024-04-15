@@ -152,7 +152,7 @@ static GameState* create_game_state(void *memory, u64 memory_size)
     }
 
     for (u32 i = 0; i < UNIT_TYPE_COUNT; ++i) {
-        state->max_units[i] = 5;
+        state->max_units[i] = 15;
     }
 
     return state;

@@ -28,6 +28,11 @@ struct GameWorld : Entity
 struct GameScene : Entity
 {
 
+    u32 spawn_seed;
+    u32 units_left_in_wave;
+    float time_until_next_spawn;
+
+    PentagramEntitySpawner *penta_spawner;
 
     void OnCreate() override
     {
@@ -36,21 +41,16 @@ struct GameScene : Entity
 
         GameWorld *game_world = AllocateEntity<GameWorld>();
 
-        PentagramEntitySpawner *penta_spawner = AllocateEntity<PentagramEntitySpawner>();
-
+        penta_spawner = AllocateEntity<PentagramEntitySpawner>();
         penta_spawner->projectile_container_ref = game_world->projectile_container_ref;
         penta_spawner->unit_container_ref = game_world->unit_container_ref;
         penta_spawner->tesseract_ref = game_world->tesseract_ref;
 
-        for (u32 i = 0; i < 10; ++i) {
-            float x = halton(i, 2) * state->screen_width;
-            float y = halton(i, 3) * state->screen_height;
-
-            penta_spawner->Summon(Vector3 { x, y, 0 }, { UnitType_LIGHT, 1, true });
-        }
-
         CardScene *card_scene = AllocateEntity<CardScene>();
         card_scene->spawner_ref = MakeRef<PentagramEntitySpawner>(penta_spawner);
+
+        units_left_in_wave = 10;
+        time_until_next_spawn = 3;
 
         PushChild(card_scene);
         PushChild(game_world);
@@ -60,7 +60,22 @@ struct GameScene : Entity
     void Update() override
     {
         Entity::Update();
-        state->stats.match_duration += GetFrameTime();
+
+        float delta = GetFrameTime();
+        state->stats.match_duration += delta;
+
+        if (units_left_in_wave > 0) {
+            time_until_next_spawn -= delta;
+            if (time_until_next_spawn <= 0) {
+                float x = halton(units_left_in_wave + spawn_seed, 2) * state->screen_width;
+                float y = halton(units_left_in_wave + spawn_seed, 3) * state->screen_height;
+
+                penta_spawner->Summon(Vector3 { x, y, 0 }, { UnitType_LIGHT, 1, true });
+
+                time_until_next_spawn = 0.25 * halton(units_left_in_wave + spawn_seed, 5) + 0.2;
+                units_left_in_wave--;
+            }
+        }
     }
 
 
