@@ -95,6 +95,30 @@ struct UnitEntity : Entity
         attack_cooldown -= GetFrameTime();
     }
 
+    void OnEnable() override
+    {
+        TraceLog(LOG_DEBUG, "OnEnbale: Alive units");
+        Entity::OnEnable();
+
+        if (appearance >= UNIT_TYPE_COUNT || team != FRIENDLY) {
+            return;
+        }
+
+        state->alive_units[appearance]++;
+    }
+
+    void OnDisable() override
+    {
+        TraceLog(LOG_DEBUG, "OnDisable: Alive units");
+        Entity::OnDisable();
+
+        if (appearance >= UNIT_TYPE_COUNT || team != FRIENDLY) {
+            return;
+        }
+
+        state->alive_units[appearance]--;
+    }
+
     void Damage(u32 damage_received)
     {
         if (health <= damage_received) {
