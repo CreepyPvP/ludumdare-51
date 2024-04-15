@@ -322,6 +322,8 @@ struct UnitManagementEntity : Entity
 
             if (dist < (attack_merge_range * attack_merge_range)) {
                 TraceLog(LOG_INFO, "Merge into core");
+                current_target->overall_target->Damage(current_target->damage);
+                DeleteEntity(current_target);
                 return;
             }
 
@@ -391,21 +393,21 @@ void ConfigureHostile(UnitEntity* unit, TesseractEntity* tesseract) {
 void ConfigureTank(UnitEntity* unit) {
     unit->appearance = AppearanceType::TANK;
     unit->attack_range = 25;
-    unit->damage = 3;
+    unit->damage = 2;
 
-    unit->health = 10;
-    unit->max_health = 10;
+    unit->health = 30;
+    unit->max_health = 30;
 
     unit->attack_speed = 1;
 }
 void ConfigureLight(UnitEntity* unit) {
     unit->attack_range = 25;
-    unit->damage = 3;
+    unit->damage = 5;
 
-    unit->health = 10;
-    unit->max_health = 10;
+    unit->health = 20;
+    unit->max_health = 20;
 
-    unit->attack_speed = 1;
+    unit->attack_speed = 0.8;
 }
 void ConfigureArcher(UnitEntity* unit) {
     unit->attack_type = UnitAttackType::RANGED;
