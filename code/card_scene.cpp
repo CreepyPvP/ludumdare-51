@@ -5,15 +5,15 @@
 
 #define CARD_FOLLOW_SPEED 1000.0f
 
+
 struct CardTargetEntity : Entity
 {
 
     void OnRender() override
     {
-        // DrawLine(0, 0, -local_position.x, -local_position.y - CARD_HEIGHT_H, WHITE);
+        DrawSprite(0, 0, 40 * 3, 40 * 3, {230, 41, 55, 80}, AppearanceType::PENTAGRAM, 0);
         DrawLineEx({0, 0}, {-local_position.x + CARD_WIDTH_H - 15, -local_position.y - CARD_HEIGHT_H - 2}, 4, WHITE);
         DrawLineEx({0, 0}, {-local_position.x - CARD_WIDTH_H + 15, -local_position.y - CARD_HEIGHT_H - 2}, 4, WHITE);
-        DrawSprite(0, 0, 40, 40, GREEN, AppearanceType::PENTAGRAM, 0);
     }
 };
 
@@ -23,9 +23,19 @@ struct CardEntity : Entity
     bool is_dragged = false;
     bool is_hovering = false;
     bool is_aiming = false;
+    bool is_locked = false;
+    bool is_on_cooldown = false;
+
+    float max_cooldown = 5;
+    float cooldown;
+
+    UnitData unitData;
+
     Sound start_hover_sfx;
+    Sound place_sfx;
     EntityRef<UnitEntity> preview_unit_ref{};
     EntityRef<CardTargetEntity> target_entity_ref{};
+    EntityRef<PentagramEntitySpawner> spawner_ref{};
 
     Vector3 start_position{};
 
@@ -35,11 +45,19 @@ struct CardEntity : Entity
     void OnCreate() override
     {
         start_hover_sfx = LoadSound("assets/cards_place_down_1.wav");
+        place_sfx = LoadSound("assets/cards_place_down_2.wav");
+    }
+
+    void OnEnable() override {
+        Entity::OnEnable();
+
+        local_position = {state->screen_width + (float) CARD_WIDTH_H + 5, -CARD_HEIGHT_H - 5};
 
         UnitEntity *preview = AllocateEntity<UnitEntity>();
         preview->is_fake = true;
         preview->local_position = {0, 15.0f - CARD_WIDTH_H};
         preview->local_scale = {3, 3, 1};
+        ConfigureFromData(preview, unitData, nullptr);
         PushChild(preview);
         preview_unit_ref = MakeRef<UnitEntity>(preview);
 
@@ -51,12 +69,9 @@ struct CardEntity : Entity
 
     void OnDestroy() override
     {
+        Entity::OnDestroy();
         UnloadSound(start_hover_sfx);
-    }
-
-    void OnEnable() override
-    {
-        local_position = {state->screen_width + (float) CARD_WIDTH_H + 5, -CARD_HEIGHT_H - 5};
+        UnloadSound(place_sfx);
     }
 
     void HandleSizing()
@@ -64,24 +79,41 @@ struct CardEntity : Entity
         local_scale = Vector3MoveTowards(local_scale, is_hovering ? hover_size : Vector3{1, 1, 1}, GetFrameTime());
     }
 
+    Rectangle GetShape()
+    {
+        return {local_position.x - CARD_WIDTH_H, local_position.y - CARD_HEIGHT_H, CARD_WIDTH,
+                CARD_HEIGHT};
+    }
+
+    void HoverUpdate()
+    {
+        if (CheckCollisionPointRec(GetMousePosition(), GetShape())) {
+            if (!is_hovering) {
+                OnStartHover();
+            }
+        } else {
+            if (is_hovering) {
+                OnStopHover();
+            }
+        }
+    }
+
     void Update() override
     {
         Entity::Update();
-        Rectangle card_shape = {local_position.x - CARD_WIDTH_H, local_position.y - CARD_HEIGHT_H, CARD_WIDTH,
-                                CARD_HEIGHT};
+
+        if (is_on_cooldown) {
+            cooldown -= GetFrameTime();
+            if (cooldown <= 0) {
+                cooldown = 0;
+                is_on_cooldown = false;
+            }
+        }
 
         HandleSizing();
 
         if (!is_dragged) {
-            if (CheckCollisionPointRec(GetMousePosition(), card_shape)) {
-                if (!is_hovering) {
-                    OnStartHover();
-                }
-            } else {
-                if (is_hovering) {
-                    OnStopHover();
-                }
-            }
+            HoverUpdate();
             if (IsMouseButtonPressed(0) && !state->click_handled && is_hovering) {
                 Select();
                 return;
@@ -106,8 +138,11 @@ struct CardEntity : Entity
 
     void Release()
     {
-        if(is_aiming) {
-            // TODO spawn pentagram
+        if (is_aiming) {
+            spawner_ref->Summon({GetMousePosition().x, GetMousePosition().y}, unitData);
+            is_on_cooldown = true;
+            cooldown = max_cooldown;
+            PlaySound(place_sfx);
         }
 
         target_entity_ref->hidden = true;
@@ -129,7 +164,7 @@ struct CardEntity : Entity
 
         float max_height = state->screen_height - CARD_HEIGHT_H + 25;
 
-        if ((mouse_screen_pos.y - (state->screen_height - CARD_HEIGHT)) < -40) {
+        if (!is_locked && !is_on_cooldown && (mouse_screen_pos.y - (state->screen_height - CARD_HEIGHT)) < -40) {
             is_aiming = true;
             DoWorldDrag();
             return;
@@ -193,23 +228,57 @@ struct CardEntity : Entity
         int text_width = MeasureText(text, 30);
         DrawText(text, -text_width / 2, -CARD_WIDTH_H - 55, 30, WHITE);
     }
+
+    void OnLateRender()
+    {
+        Rectangle card_shape = {-CARD_WIDTH_H, -CARD_HEIGHT_H, CARD_WIDTH, CARD_HEIGHT};
+
+        if (is_locked || is_on_cooldown) {
+            DrawRectangleRounded(card_shape, 0.2f, 1, {0, 0, 0, 120});
+            DrawRectangleRoundedLines(card_shape, 0.2f, 1, 4, {0, 0, 0, 120});
+
+            const char *text = TextFormat("%.2f", cooldown);
+
+            int text_width = MeasureText(text, 30);
+            DrawText(text, -text_width / 2, -CARD_WIDTH_H - 15, 30, WHITE);
+        }
+    }
 };
 
 
 struct CardScene : Entity
 {
-    void OnCreate() override
+    EntityRef<PentagramEntitySpawner> spawner_ref{};
+
+
+    void OnEnable() override
     {
+        Entity::OnEnable();
 
         CardEntity *card = AllocateEntity<CardEntity>();
         card->start_position = {((float) state->screen_width / 2) + CARD_WIDTH - 15, (float) state->screen_height + 40};
+        card->spawner_ref = spawner_ref;
+        card->unitData = {
+                UnitType_ARCHER,
+                5,
+        };
         PushChild(card);
 
         card = AllocateEntity<CardEntity>();
         card->start_position = {((float) state->screen_width / 2), (float) state->screen_height + 40};
+        card->spawner_ref = spawner_ref;
+        card->unitData = {
+                UnitType_TANK,
+                5,
+        };
         PushChild(card);
         card = AllocateEntity<CardEntity>();
         card->start_position = {((float) state->screen_width / 2) - CARD_WIDTH + 15, (float) state->screen_height + 40};
+        card->spawner_ref = spawner_ref;
+        card->unitData = {
+                UnitType_MEDIC,
+                5,
+        };
         PushChild(card);
     }
 

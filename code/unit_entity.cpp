@@ -16,15 +16,18 @@ enum TargetingType
     TEAM
 };
 
-struct TesseractEntity : Entity {
+struct TesseractEntity : Entity
+{
 
     u32 damage_sfx_counter;
 
-    void OnRender() override {
+    void OnRender() override
+    {
         DrawSprite(0, 0, 40, 40, ORANGE, AppearanceType::TESSERACT, 0);
     }
 
-    void Damage(u32 damage) {
+    void Damage(u32 damage)
+    {
         PlaySound(state->tesseract_damaged_sound[damage_sfx_counter]);
 
         damage_sfx_counter = (damage_sfx_counter + 1) % 3;
@@ -45,24 +48,24 @@ struct UnitEntity : Entity
 
 
     // float avoid_factor = 30;
-    float protection_distance = 40;
+    float protection_distance;
 
     float move_factor;
 
-    float enemy_detection_range = 100;
+    float enemy_detection_range;
     float attack_range;
-    float projectile_speed = 150;
+    float projectile_speed;
 
     // Attacks lowest HP enemy in prio range
     bool prioritize_execute;
-    float prioritized_range = 25;
+    float prioritized_range;
 
-    float attack_merge_range = 5;
-    u32 damage = 3;
+    float attack_merge_range;
+    u32 damage;
 
-    u32 health = 10;
-    u32 max_health = 10;
-    float attack_speed = 1;
+    u32 health;
+    u32 max_health;
+    float attack_speed;
     float attack_cooldown;
 
     bool is_fake;
@@ -135,6 +138,7 @@ struct UnitEntity : Entity
         }
         health -= damage_received;
     }
+
     void Heal(u32 damage_received)
     {
         health += damage_received;
@@ -147,6 +151,15 @@ struct UnitEntity : Entity
     float GetHealthPercentage() const
     {
         return (float) health / (float) max_health;
+    }
+
+    void OnDestroy() override
+    {
+        if (!is_fake && team == UnitTeam::HOSTILE) {
+            state->stats.enemies_killed += 1;
+        }
+        Entity::OnDestroy();
+
     }
 };
 
@@ -189,7 +202,7 @@ struct ProjectileEntity : Entity
 
     void HitTarget()
     {
-        if(targeting_type == ENEMY) {
+        if (targeting_type == ENEMY) {
             target->Damage(damage);
         } else {
             target->Heal(damage);
@@ -202,7 +215,7 @@ struct ProjectileEntity : Entity
 
 void UnitEntity::TryAttack(UnitEntity *target_unit)
 {
-    if(targeting_type == TargetingType::TEAM && target_unit->GetHealthPercentage() >= 1) {
+    if (targeting_type == TargetingType::TEAM && target_unit->GetHealthPercentage() >= 1) {
         return;
     }
 
@@ -210,7 +223,7 @@ void UnitEntity::TryAttack(UnitEntity *target_unit)
 
     if (attack_type == UnitAttackType::MELEE) {
         this->attack_cooldown = this->attack_speed;
-        if(targeting_type == TargetingType::ENEMY) {
+        if (targeting_type == TargetingType::ENEMY) {
             target_unit->Damage(this->damage);
             TraceLog(LOG_INFO, "Attack %d(%d) -> %d(%d) for %d. Remaining %d", this->team, this->id, target_unit->team,
                      target_unit->id, this->damage, target_unit->health);
@@ -292,13 +305,15 @@ struct UnitManagementEntity : Entity
 
                 float distanceSqr = Vector3LengthSqr(delta);
 
-                if(current_target->targeting_type != TargetingType::TEAM || current_target->appearance != other_target->appearance) {
+                if (current_target->targeting_type != TargetingType::TEAM ||
+                    current_target->appearance != other_target->appearance) {
                     HandleNormalAttackCheck(distanceSqr, enemy_detection_range, closest_enemy_dist, closest_enemy,
                                             other_target);
                 }
 
                 if (current_target->prioritize_execute) {
-                    HandlePriorityAttackCheck(distanceSqr, prioritized_range, priority_enemy_dist, priority_enemy_health, priority_enemy, other_target);
+                    HandlePriorityAttackCheck(distanceSqr, prioritized_range, priority_enemy_dist,
+                                              priority_enemy_health, priority_enemy, other_target);
                 }
 
                 other_target = (UnitEntity *) *other_target->next;
@@ -318,7 +333,7 @@ struct UnitManagementEntity : Entity
             other_target = (UnitEntity *) *other_target->next;
         }
 
-        if(priority_enemy) {
+        if (priority_enemy) {
             closest_enemy = priority_enemy;
         }
 
@@ -360,27 +375,32 @@ struct UnitManagementEntity : Entity
         current_target->local_position.y += deltaNorm.y * avoid_factor * GetFrameTime();
     }
 
-    static void HandlePriorityAttackCheck(float distanceSqr, float prioritized_range, float &priority_enemy_dist, float &priority_enemy_health, UnitEntity *&priority_enemy, UnitEntity *other_target) {
+    static void HandlePriorityAttackCheck(float distanceSqr, float prioritized_range, float &priority_enemy_dist,
+                                          float &priority_enemy_health, UnitEntity *&priority_enemy,
+                                          UnitEntity *other_target)
+    {
         if (distanceSqr > (prioritized_range * prioritized_range)) {
             return;
         }
         float health_perc = other_target->GetHealthPercentage();
 
-        if(!priority_enemy) {
-            if(health_perc >= 1) return;
+        if (!priority_enemy) {
+            if (health_perc >= 1) return;
             priority_enemy = other_target;
             priority_enemy_health = health_perc;
             priority_enemy_dist = distanceSqr;
             return;
         }
 
-        if(health_perc > priority_enemy_health) return;
+        if (health_perc > priority_enemy_health) return;
         priority_enemy = other_target;
         priority_enemy_health = health_perc;
         priority_enemy_dist = distanceSqr;
     }
 
-    static void HandleNormalAttackCheck(float distanceSqr, float enemy_detection_range, float &closest_enemy_dist, UnitEntity *&closest_enemy, UnitEntity *other_target) {
+    static void HandleNormalAttackCheck(float distanceSqr, float enemy_detection_range, float &closest_enemy_dist,
+                                        UnitEntity *&closest_enemy, UnitEntity *other_target)
+    {
         if (distanceSqr > (enemy_detection_range * enemy_detection_range)) {
             return;
         }
@@ -393,7 +413,8 @@ struct UnitManagementEntity : Entity
 };
 
 
-void ConfigureFriendly(UnitEntity* unit) {
+void ConfigureFriendly(UnitEntity *unit)
+{
     unit->team = UnitTeam::FRIENDLY;
 
     unit->enemy_detection_range = 999999;
@@ -402,7 +423,8 @@ void ConfigureFriendly(UnitEntity* unit) {
     unit->protection_distance = 40;
 }
 
-void ConfigureHostile(UnitEntity* unit, TesseractEntity* tesseract) {
+void ConfigureHostile(UnitEntity *unit, TesseractEntity *tesseract)
+{
     unit->team = UnitTeam::HOSTILE;
     unit->overall_target = MakeRef<TesseractEntity>(tesseract);
 
@@ -413,7 +435,8 @@ void ConfigureHostile(UnitEntity* unit, TesseractEntity* tesseract) {
     unit->protection_distance = 40;
 }
 
-void ConfigureTank(UnitEntity* unit) {
+void ConfigureTank(UnitEntity *unit)
+{
     unit->appearance = AppearanceType::TANK;
     unit->attack_range = 25;
     unit->damage = 2;
@@ -424,7 +447,8 @@ void ConfigureTank(UnitEntity* unit) {
     unit->attack_speed = 1;
 }
 
-void ConfigureLight(UnitEntity* unit) {
+void ConfigureLight(UnitEntity *unit)
+{
     unit->attack_range = 25;
     unit->damage = 5;
 
@@ -434,7 +458,8 @@ void ConfigureLight(UnitEntity* unit) {
     unit->attack_speed = 0.8;
 }
 
-void ConfigureArcher(UnitEntity* unit) {
+void ConfigureArcher(UnitEntity *unit)
+{
     unit->attack_type = UnitAttackType::RANGED;
     unit->appearance = AppearanceType::ARCHER;
     unit->attack_range = 100;
@@ -447,7 +472,8 @@ void ConfigureArcher(UnitEntity* unit) {
     unit->projectile_speed = 150;
 }
 
-void ConfigureMedic(UnitEntity* unit) {
+void ConfigureMedic(UnitEntity *unit)
+{
     unit->attack_type = UnitAttackType::RANGED;
     unit->appearance = AppearanceType::MEDIC;
     unit->attack_range = 100;
@@ -464,12 +490,122 @@ void ConfigureMedic(UnitEntity* unit) {
     unit->prioritized_range = unit->attack_range * 2;
 }
 
-struct PentagramEntity: Entity
+void ConfigureFromData(UnitEntity *unit, UnitData &data, TesseractEntity *tesseract)
 {
+    if (data.hostile) {
+        ConfigureHostile(unit, tesseract);
+    } else {
+        ConfigureFriendly(unit);
+    }
+
+    switch (data.type) {
+        case UnitType_LIGHT:
+            ConfigureLight(unit);
+            break;
+        case UnitType_ARCHER:
+            ConfigureArcher(unit);
+            break;
+        case UnitType_TANK:
+            ConfigureTank(unit);
+            break;
+        case UnitType_MEDIC:
+            ConfigureMedic(unit);
+            break;
+    }
+}
+
+struct PentagramEntity : Entity
+{
+
+    float spawn_timer;
+    UnitData data;
+
+    Sound sound;
+
+    EntityRef<Entity> unit_container_ref{};
+    EntityRef<Entity> projectile_container_ref{};
+    EntityRef<TesseractEntity> tesseract_ref{};
+
+    bool finished;
+
+    void OnEnable() override
+    {
+        Entity::OnEnable();
+        sound = LoadSoundAlias(state->unit_summoned_sound[data.type]);
+    }
+
+    void OnDisable() override
+    {
+        UnloadSoundAlias(sound);
+    }
+
+    void SpawnUnits()
+    {
+        finished = true;
+        PlaySound(sound);
+        spawn_timer = 0.5f;
+        for (int i = 0; i < data.amount; ++i) {
+            UnitEntity *unit = AllocateEntity<UnitEntity>();
+
+            unit->local_position = local_position;
+
+            unit->projectile_container = projectile_container_ref;
+            ConfigureFromData(unit, data, *tesseract_ref);
+
+            unit_container_ref->PushChild(unit);
+        }
+    }
+
+    void Update() override
+    {
+        Entity::Update();
+
+        spawn_timer -= GetFrameTime();
+        if (spawn_timer < 0) {
+            if (!finished) {
+                SpawnUnits();
+            } else {
+
+                DeleteEntity(this);
+            }
+        }
+    }
 
     void OnRender() override
     {
-        DrawSprite(0, 0, 40, 40, WHITE, PENTAGRAM, 0);
+        DrawSprite(0, 0, 40 * 3, 40 * 3, RED, PENTAGRAM, 0);
     }
 
 };
+
+struct PentagramEntitySpawner : Entity
+{
+
+    EntityRef<Entity> unit_container_ref{};
+    EntityRef<Entity> projectile_container_ref{};
+    EntityRef<TesseractEntity> tesseract_ref{};
+
+    void Summon(Vector3 position, UnitData data)
+    {
+        PentagramEntity *penta = AllocateEntity<PentagramEntity>();
+        penta->data = data;
+        penta->spawn_timer = 3;
+        penta->local_position = position;
+        penta->unit_container_ref = unit_container_ref;
+        penta->projectile_container_ref = projectile_container_ref;
+        penta->tesseract_ref = tesseract_ref;
+        PushChild(penta);
+    }
+
+
+    void OnCreate() override
+    {
+        Entity::OnCreate();
+    }
+
+    void OnDestroy() override
+    {
+        Entity::OnDestroy();
+    }
+};
+
