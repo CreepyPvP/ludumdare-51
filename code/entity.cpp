@@ -49,6 +49,7 @@ struct Entity
     u32 id;
     u32 generation;
     u32 flags = 0;
+    u32 child_count = 0;
     bool hidden;
 
     Vector3 local_position;
@@ -188,6 +189,7 @@ struct Entity
         new_child->next = child;
 
         child = MakeRef<Entity>(new_child);
+        child_count++;
         child->parent = MakeRef<Entity>(this);
 
         // Activate new child if required and self active
@@ -216,6 +218,7 @@ struct Entity
                 }
 
                 if (current->flags & EntityStateFlag::ACTIVE) current->OnDisable();
+                child_count--;
 
                 return;
             }
@@ -242,6 +245,8 @@ struct Entity
     Entity *PopChild()
     {
         Entity *old_child = *child;
+        if(!old_child)
+            return nullptr;
         old_child->SetParent(nullptr);
         return old_child;
     }
