@@ -6,6 +6,7 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <assert.h>
 #include <stdint.h>
@@ -30,6 +31,19 @@ typedef double f64;
 
 #include "arena.h"
 
+enum AppearanceType
+{
+    LIGHT,
+    ARCHER,
+    TANK,
+    MEDIC,
+
+    UNIT_TYPE_COUNT,
+
+    PROJECTILE,
+    TESSERACT
+};
+
 struct EntitySlot
 {
     char buffer[256];
@@ -50,6 +64,11 @@ struct GameState
 
     i32 screen_width;
     i32 screen_height;
+
+    u32 max_units[UNIT_TYPE_COUNT];
+    u32 alive_units[UNIT_TYPE_COUNT];
+    Music unit_music[UNIT_TYPE_COUNT];
+    Sound unit_summoned_sound[UNIT_TYPE_COUNT];
 };
 
 GameState *state;
@@ -92,7 +111,7 @@ void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, i32 type)
 #include "game_entity.cpp"
 #include "arena.cpp"
 
-static GameState *create_game_state(void *memory, u64 memory_size)
+static GameState* create_game_state(void *memory, u64 memory_size)
 {
     GameState pre = {};
     InitArena(&pre.arena, memory, memory_size);
@@ -112,7 +131,34 @@ static GameState *create_game_state(void *memory, u64 memory_size)
         state->entity_generations[i] = 1;
     }
 
+    for (u32 i = 0; i < UNIT_TYPE_COUNT; ++i) {
+        state->max_units[i] = 5;
+    }
+
     return state;
+}
+
+void load_game_audio(GameState *state)
+{
+    Sound melee_summon = LoadSound("assets/melee_summon.wav");
+    Music melee_music = LoadMusicStream("assets/Melee_summoned_music.wav");
+
+    state->unit_music[LIGHT] = LoadMusicStream("assets/Melee_summoned_music.wav");
+    // state->unit_music[ARCHER];
+    state->unit_music[TANK] = LoadMusicStream("assets/Tank_summoned_music.wav");
+    // state->unit_music[MEDIC];
+
+    state->unit_summoned_sound[LIGHT] = LoadSound("assets/melee_summon.wav");
+    // state->unit_summoned_sound[ARCHER] = LoadSound("assets/melee_summon.wav");
+    state->unit_summoned_sound[TANK] = LoadSound("assets/tank_summon.wav");
+    state->unit_summoned_sound[MEDIC] = LoadSound("assets/medic_summon.wav");
+
+    for (u32 i = 0; i < UNIT_TYPE_COUNT; ++i) {
+        if (!IsMusicReady(state->unit_music[i])) {
+            continue;
+        }
+        PlayMusicStream(state->unit_music[i]);
+    }
 }
 
 i32 main(void)
@@ -129,11 +175,10 @@ i32 main(void)
 
     root->PushChild(development_scene);
 
-
     InitWindow(state->screen_width, state->screen_height, "Title...");
     InitAudioDevice();
 
-    SetShapesTexture({}, {});
+    load_game_audio(state);
 
     // DisableCursor();
     SetTargetFPS(60);
@@ -152,8 +197,17 @@ i32 main(void)
 
     while (!WindowShouldClose()) {
         seconds += GetFrameTime();
-
         SetShaderValue(state->neon_shader, seconds_loc, &seconds, SHADER_UNIFORM_FLOAT);
+
+        for (u32 i = 0; i < UNIT_TYPE_COUNT; ++i) {
+            if (!IsMusicReady(state->unit_music[i])) {
+                continue;
+            }
+
+            float volume = fmin((float) state->alive_units[i] / (float) state->max_units[i], 1);
+            UpdateMusicStream(state->unit_music[i]);
+            SetMusicVolume(state->unit_music[i], volume);
+        }
 
         root->Update();
         ClearBackground(BLACK);

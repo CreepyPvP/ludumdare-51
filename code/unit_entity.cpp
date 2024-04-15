@@ -16,16 +16,6 @@ enum TargetingType
     TEAM
 };
 
-enum AppearanceType
-{
-    LIGHT,
-    ARCHER,
-    TANK,
-    MEDIC,
-    PROJECTILE,
-    TESSERACT
-};
-
 struct TesseractEntity : Entity {
     void OnRender() override {
         DrawSprite(0, 0, 40, 40, ORANGE, AppearanceType::TESSERACT);
