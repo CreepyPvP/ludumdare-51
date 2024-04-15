@@ -39,13 +39,13 @@ void main()
     // NOTE: From 1 to 0
 
     //circle
-    if(entity_type == 0) {
+    if (entity_type == 0) {
         d = circle(pos, vec2(0.0, 0.0), 0.5);
         // d = min(d, line(pos, vec2(-0.8, 0), vec2(0.8, 0), 0));
     }
 
     // triangle - light unit
-    if(entity_type == 1) {
+    if (entity_type == 1) {
         float a = line(pos, vec2(-0.5, -0.5), vec2(0.5, -0.5), 0.0);
         float b = line(pos, vec2(0.5, -0.5), vec2(0.0, 0.5), 0.0);
         float c = line(pos, vec2(-0.5, -0.5), vec2(0.0, 0.5), 0.0);
@@ -68,7 +68,7 @@ void main()
     // }
 
     // square
-    if(entity_type == 2)
+    if (entity_type == 2)
     {
         float a = line(pos, vec2(-0.5, -0.5), vec2(0.5, -0.5), 0.0);
         float b = line(pos, vec2(0.5, -0.5), vec2(0.5, 0.5), 0.0);
@@ -81,7 +81,7 @@ void main()
     }
 
     // cross
-    if(entity_type == 3)
+    if (entity_type == 3)
     {
 
         float a = line(pos, vec2(-0.25, -0.5), vec2(0.25, -0.5), 0.0);
@@ -111,6 +111,11 @@ void main()
         d = min(d, k);
         d = min(d, l);
         d = min(d, m);
+    }
+
+    // pentagram, hail satan
+    if (entity_type == 7) {
+        float a = 0.0;
     }
 
     float thickness = 0.06;

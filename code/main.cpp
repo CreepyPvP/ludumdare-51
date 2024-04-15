@@ -41,7 +41,8 @@ enum AppearanceType
     UNIT_TYPE_COUNT,
 
     PROJECTILE,
-    TESSERACT
+    TESSERACT,
+    PENTAGRAM
 };
 
 struct EntitySlot
@@ -77,7 +78,7 @@ struct GameState
 
 GameState *state;
 
-void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, i32 type)
+void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, AppearanceType type)
 {
 
     BeginShaderMode(state->neon_shader);

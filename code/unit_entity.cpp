@@ -183,7 +183,7 @@ struct ProjectileEntity : Entity
 
     void OnRender() override
     {
-        DrawSprite(0, 0, 10, 10, color, 0);
+        DrawSprite(0, 0, 10, 10, color, LIGHT);
     }
 
     void HitTarget()
@@ -400,6 +400,7 @@ void ConfigureFriendly(UnitEntity* unit) {
 
     unit->protection_distance = 40;
 }
+
 void ConfigureHostile(UnitEntity* unit, TesseractEntity* tesseract) {
     unit->team = UnitTeam::HOSTILE;
     unit->overall_target = MakeRef<TesseractEntity>(tesseract);
@@ -421,6 +422,7 @@ void ConfigureTank(UnitEntity* unit) {
 
     unit->attack_speed = 1;
 }
+
 void ConfigureLight(UnitEntity* unit) {
     unit->attack_range = 25;
     unit->damage = 5;
@@ -430,6 +432,7 @@ void ConfigureLight(UnitEntity* unit) {
 
     unit->attack_speed = 0.8;
 }
+
 void ConfigureArcher(UnitEntity* unit) {
     unit->attack_type = UnitAttackType::RANGED;
     unit->appearance = AppearanceType::ARCHER;
@@ -442,6 +445,7 @@ void ConfigureArcher(UnitEntity* unit) {
     unit->attack_speed = 1;
     unit->projectile_speed = 150;
 }
+
 void ConfigureMedic(UnitEntity* unit) {
     unit->attack_type = UnitAttackType::RANGED;
     unit->appearance = AppearanceType::MEDIC;
@@ -458,3 +462,13 @@ void ConfigureMedic(UnitEntity* unit) {
     unit->prioritize_execute = true;
     unit->prioritized_range = unit->attack_range * 2;
 }
+
+struct PentagramEntity: Entity
+{
+
+    void OnRender() override
+    {
+        DrawSprite(0, 0, 40, 40, WHITE, PENTAGRAM);
+    }
+
+};

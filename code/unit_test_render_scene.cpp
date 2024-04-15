@@ -45,7 +45,7 @@ struct UnitTestRenderScene : Entity
         GuiUnlock();
 
         if (GuiDropdownBox((Rectangle){ 10, 50, 125, 30 },
-                           "LIGHT;ARCHER;TANK;MEDIC;PROJECTILE",
+                           "LIGHT;ARCHER;TANK;MEDIC;PLACEHOLDER;PROJECTILE;TESSERACT;PENTAGRAM",
                            (i32*) &entity->appearance, dropdown_edit)) {
             dropdown_edit = !dropdown_edit;
         }
