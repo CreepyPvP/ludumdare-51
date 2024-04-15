@@ -34,7 +34,7 @@ PLAT_ID := win
 ifndef PROD
 COMPILER_OPTS := -Wno-enum-compare -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib -g -O0
 else
-COMPILER_OPTS := -Wno-enum-compare -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib -03
+COMPILER_OPTS := -Wno-enum-compare -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib -O3
 endif
 COMPILER_OPTS_RAYLIB := $(COMPILER_OPTS) -D_GNU_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -I raylib/external/glfw/include
 DESKTOP := 1
