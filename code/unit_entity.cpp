@@ -39,10 +39,10 @@ struct UnitEntity : Entity
     // float avoid_factor = 30;
     float protection_distance = 40;
 
-    float move_factor = 35;
+    float move_factor;
 
     float enemy_detection_range = 100;
-    float attack_range = 25;
+    float attack_range;
     float projectile_speed = 150;
 
     // Attacks lowest HP enemy in prio range
@@ -55,7 +55,7 @@ struct UnitEntity : Entity
     u32 health = 10;
     u32 max_health = 10;
     float attack_speed = 1;
-    float attack_cooldown = 0;
+    float attack_cooldown;
 
     inline Color GetColor() const
     {
@@ -356,3 +356,71 @@ struct UnitManagementEntity : Entity
         closest_enemy = other_target;
     }
 };
+
+
+void ConfigureFriendly(UnitEntity* unit) {
+    unit->team = UnitTeam::FRIENDLY;
+
+    unit->enemy_detection_range = 999999;
+    unit->move_factor = 100;
+
+    unit->protection_distance = 40;
+}
+void ConfigureHostile(UnitEntity* unit, Entity* tesseract) {
+    unit->team = UnitTeam::HOSTILE;
+    unit->overall_target = MakeRef<Entity>(tesseract);
+
+    unit->enemy_detection_range = 100;
+    unit->move_factor = 35;
+    unit->attack_merge_range = 5;
+
+    unit->protection_distance = 40;
+}
+
+void ConfigureTank(UnitEntity* unit) {
+    unit->appearance = AppearanceType::TANK;
+    unit->attack_range = 25;
+    unit->damage = 3;
+
+    unit->health = 10;
+    unit->max_health = 10;
+
+    unit->attack_speed = 1;
+}
+void ConfigureLight(UnitEntity* unit) {
+    unit->attack_range = 25;
+    unit->damage = 3;
+
+    unit->health = 10;
+    unit->max_health = 10;
+
+    unit->attack_speed = 1;
+}
+void ConfigureArcher(UnitEntity* unit) {
+    unit->attack_type = UnitAttackType::RANGED;
+    unit->appearance = AppearanceType::ARCHER;
+    unit->attack_range = 100;
+    unit->damage = 3;
+
+    unit->health = 10;
+    unit->max_health = 10;
+
+    unit->attack_speed = 1;
+    unit->projectile_speed = 150;
+}
+void ConfigureMedic(UnitEntity* unit) {
+    unit->attack_type = UnitAttackType::RANGED;
+    unit->appearance = AppearanceType::MEDIC;
+    unit->attack_range = 100;
+    unit->damage = 3;
+
+    unit->health = 10;
+    unit->max_health = 10;
+
+    unit->attack_speed = 1;
+    unit->projectile_speed = 150;
+
+    unit->targeting_type = TargetingType::TEAM;
+    unit->prioritize_execute = true;
+    unit->prioritized_range = unit->attack_range * 2;
+}

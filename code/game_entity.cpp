@@ -32,29 +32,20 @@ struct UnitManagementTestScene : Entity
             UnitEntity *unit = AllocateEntity<UnitEntity>();
 
             if (amount / 2 < i) {
-                unit->team = UnitTeam::FRIENDLY;
                 unit->local_position = {800, 0};
-                unit->enemy_detection_range = 999999;
-                unit->appearance = AppearanceType::TANK;
-                unit->move_factor = unit->move_factor * 3;
+                ConfigureFriendly(unit);
             } else {
-                unit->appearance = AppearanceType::TANK;
-                unit->team = UnitTeam::HOSTILE;
-                unit->overall_target = MakeRef<Entity>(tesseract);
+                ConfigureHostile(unit, tesseract);
             }
 
-            if(i % 2 == 0) {
-                unit->attack_type = UnitAttackType::RANGED;
-                unit->appearance = AppearanceType::ARCHER;
-                unit->attack_range = unit->attack_range * 4;
+            if(i % 5 == 0) {
+                ConfigureLight(unit);
+            } else if(i % 2 == 0) {
+                ConfigureArcher(unit);
             } else if (i % 3 == 0) {
-                unit->attack_type = UnitAttackType::RANGED;
-                unit->appearance = AppearanceType::MEDIC;
-                unit->attack_range = unit->attack_range * 4;
-
-                unit->targeting_type = TargetingType::TEAM;
-                unit->prioritize_execute = true;
-                unit->prioritized_range = unit->attack_range * 2;
+                ConfigureMedic(unit);
+            } else {
+                ConfigureTank(unit);
             }
 
             unit->projectile_container = MakeRef<Entity>(projectile_container);
