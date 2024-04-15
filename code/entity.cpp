@@ -141,11 +141,16 @@ struct Entity
             }
             next_target = *next_target->next;
         }
+        OnLateRender();
 
         rlPopMatrix();
     }
 
     virtual void OnRender()
+    {
+
+    }
+    virtual void OnLateRender()
     {
 
     }
@@ -269,6 +274,8 @@ T *AllocateEntity()
     *entity = {};
 
     entity->id = id;
+    TraceLog(LOG_DEBUG, "Created %d", entity->id);
+
     entity->generation = state->entity_generations[id];
     entity->OnCreate();
 
@@ -286,6 +293,7 @@ void DeleteEntity(T *entity)
         return;
     }
 
+    TraceLog(LOG_DEBUG, "Killed %d", entity->id);
     entity->OnDestroy();
 
     state->entity_generations[entity->id]++;

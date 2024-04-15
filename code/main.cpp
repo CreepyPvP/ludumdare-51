@@ -72,6 +72,7 @@ struct GameState
     u32 max_units[UNIT_TYPE_COUNT];
     u32 alive_units[UNIT_TYPE_COUNT];
     Music unit_music[UNIT_TYPE_COUNT];
+    Music base_layer;
     Sound unit_summoned_sound[UNIT_TYPE_COUNT];
 
     Sound tesseract_damaged_sound[3];
@@ -111,10 +112,12 @@ void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, AppearanceType
     EndShaderMode();
 }
 
+#include "unit_data.cpp"
 #include "entity.cpp"
 #include "unit_entity.cpp"
 #include "unit_test_render_scene.cpp"
 #include "card_scene.cpp"
+#include "game_scene.cpp"
 #include "game_entity.cpp"
 #include "arena.cpp"
 
@@ -148,8 +151,10 @@ static GameState* create_game_state(void *memory, u64 memory_size)
 
 void load_game_audio(GameState *state)
 {
-    Sound melee_summon = LoadSound("assets/melee_summon.wav");
-    Music melee_music = LoadMusicStream("assets/Melee_summoned_music.wav");
+    SetMasterVolume(0.15f);
+    state->base_layer = LoadMusicStream("assets/Gameplay_base_layer.wav");
+
+    PlayMusicStream(state->base_layer);
 
     state->unit_music[LIGHT] = LoadMusicStream("assets/Melee_summoned_music.wav");
     state->unit_music[ARCHER] = LoadMusicStream("assets/Range_summoned_music.wav");
@@ -157,7 +162,7 @@ void load_game_audio(GameState *state)
     state->unit_music[MEDIC] = LoadMusicStream("assets/Medic_summoned_music.wav");
 
     state->unit_summoned_sound[LIGHT] = LoadSound("assets/melee_summon.wav");
-    // state->unit_summoned_sound[ARCHER] = LoadSound("assets/melee_summon.wav");
+    state->unit_summoned_sound[ARCHER] = LoadSound("assets/Range_summon.wav");
     state->unit_summoned_sound[TANK] = LoadSound("assets/tank_summon.wav");
     state->unit_summoned_sound[MEDIC] = LoadSound("assets/medic_summon.wav");
 
@@ -214,6 +219,10 @@ i32 main(void)
         state->click_handled = false;
 
         SetShaderValue(state->neon_shader, seconds_loc, &seconds, SHADER_UNIFORM_FLOAT);
+
+        if(IsMusicReady(state->base_layer)) {
+            UpdateMusicStream(state->base_layer);
+        }
 
         for (u32 i = 0; i < UNIT_TYPE_COUNT; ++i) {
             if (!IsMusicReady(state->unit_music[i])) {
