@@ -16,6 +16,7 @@ Turn units in movement direction (opt)
 
 Round indicator
 Balance game a little bit
+Date formatting
 
 Modification system
 
