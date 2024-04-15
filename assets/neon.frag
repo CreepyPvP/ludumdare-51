@@ -33,6 +33,30 @@ vec2 distort_pos(vec2 pos)
     return pos;
 }
 
+float hexagon(vec2 pos, float speed) {
+    vec2 p0 = vec2(cos(speed * seconds + 0.0),              sin(speed * seconds + 0.0)) * 0.5;
+    vec2 p1 = vec2(cos(speed * seconds + 1.0 / 3.0 * 3.14), sin(speed * seconds + 1.0 / 3.0 * 3.14)) * 0.5;
+    vec2 p2 = vec2(cos(speed * seconds + 2.0 / 3.0 * 3.14), sin(speed * seconds + 2.0 / 3.0 * 3.14)) * 0.5;
+    vec2 p3 = vec2(cos(speed * seconds + 3.0 / 3.0 * 3.14), sin(speed * seconds + 3.0 / 3.0 * 3.14)) * 0.5;
+    vec2 p4 = vec2(cos(speed * seconds + 4.0 / 3.0 * 3.14), sin(speed * seconds + 4.0 / 3.0 * 3.14)) * 0.5;
+    vec2 p5 = vec2(cos(speed * seconds + 5.0 / 3.0 * 3.14), sin(speed * seconds + 5.0 / 3.0 * 3.14)) * 0.5;
+
+    float a = line(pos, p0, p1, 0.0);
+    float b = line(pos, p1, p2, 0.0);
+    float c = line(pos, p2, p3, 0.0);
+    float e = line(pos, p3, p4, 0.0);
+    float f = line(pos, p4, p5, 0.0);
+    float g = line(pos, p5, p0, 0.0);
+
+    float d = min(a, b);
+    d = min(d, c);
+    d = min(d, e);
+    d = min(d, f);
+    d = min(d, g);
+
+    return d;
+}
+
 void main()
 {
     vec2 pos = distort_pos(2.0 * uv - vec2(1.0));
@@ -112,6 +136,11 @@ void main()
         d = min(d, k);
         d = min(d, l);
         d = min(d, m);
+    }
+
+    // tesseract, beware purple alien
+    if (entity_type == 6) {
+        d = hexagon(pos, 1.0);
     }
 
     // pentagram, hail satan
