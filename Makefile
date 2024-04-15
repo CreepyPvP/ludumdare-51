@@ -109,5 +109,5 @@ ifdef DESKTOP
 RELEASE_CONTENT := $(DIST_OUT)/game.exe
 endif
 $(DIST_OUT)/release.zip: $(RELEASE_CONTENT)
-	@mkdir -p $(@D)
+	# @mkdir -p $(@D)
 	tar.exe -a -c -f $(DIST_OUT)/release.zip $(RELEASE_CONTENT)
