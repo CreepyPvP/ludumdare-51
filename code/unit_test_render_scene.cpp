@@ -12,6 +12,9 @@ struct UnitTestRenderScene : Entity
 
         entity = AllocateEntity<UnitEntity>();
         entity->is_fake = true;
+
+        ConfigureFriendly(entity);
+        ConfigureTank(entity);
         PushChild(entity);
         entity->local_position = {400, 225};
     }
