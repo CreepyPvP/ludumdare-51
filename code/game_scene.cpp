@@ -29,7 +29,6 @@ struct GameWorld : Entity
 struct GameScene : Entity
 {
 
-    // TODO: Set this one correctly
     u32 spawn_seed;
     u32 units_left_in_wave;
     float time_until_next_spawn;
@@ -58,9 +57,11 @@ struct GameScene : Entity
         CardScene *card_scene = AllocateEntity<CardScene>();
         card_scene->spawner_ref = MakeRef<PentagramEntitySpawner>(penta_spawner);
 
-        units_left_in_wave = 10 + wave_id;
+        units_left_in_wave = 4;
         time_until_next_spawn = 0;
         time_until_next_wave = 3;
+
+        u32 spawn_seed = GetRandomValue(0, 10000);
 
         PushChild(card_scene);
         PushChild(game_world);
@@ -95,15 +96,38 @@ struct GameScene : Entity
                     float x = 0, y = 0, dist;
 
                     do {
-                        x = halton(units_left_in_wave + spawn_seed + x * 100 + y * 200, 2);
-                        y = halton(units_left_in_wave + spawn_seed + x * 200 + y * 100, 3);
+                        x = halton(units_left_in_wave + 20 * wave_id + spawn_seed + x * 100 + y * 200, 2);
+                        y = halton(units_left_in_wave + 20 * wave_id + spawn_seed + x * 200 + y * 100, 3);
                         dist = (x - 0.5) * (x - 0.5) + (y - 0.5) * (y - 0.5);
                     } while (dist < 0.2 * 0.2);
 
                     x *= state->screen_width;
                     y *= state->screen_height;
 
-                    penta_spawner->Summon(Vector3 { x, y, 0 }, { UnitType_LIGHT, 1, true });
+                    UnitType type = UnitType_LIGHT;
+                    if (units_left_in_wave % 4 == 0) {
+                        type = UnitType_ARCHER;
+                    }
+                    if (wave_id > 3 && units_left_in_wave % 5 == 0) {
+                        type = UnitType_TANK;
+                    }
+                    if (wave_id > 5 && units_left_in_wave % 7 == 0) {
+                        type = UnitType_MEDIC;
+                    }
+
+                    u32 batch_size = 1;
+                    float batch_random = halton(units_left_in_wave + wave_id + spawn_seed, 7);
+                    if (batch_random > 0.6) {
+                        batch_size = 2;
+                    }
+                    if (wave_id > 3 && batch_random > 0.8) {
+                        batch_size = 3;
+                    }
+                    if (wave_id > 8 && batch_random > 0.7) {
+                        batch_size = 4;
+                    }
+
+                    penta_spawner->Summon(Vector3 { x, y, 0 }, { type, batch_size, true });
 
                     time_until_next_spawn = 0.25 * halton(units_left_in_wave + spawn_seed, 5) + 0.2;
                     units_left_in_wave--;
@@ -112,7 +136,7 @@ struct GameScene : Entity
                         wave_id++;
                         time_until_next_wave = 20;
                         time_until_next_spawn = 0;
-                        units_left_in_wave = 10 + wave_id * 3;
+                        units_left_in_wave = 10 + wave_id * 2;
                     }
                 }
             }
