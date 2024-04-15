@@ -19,7 +19,7 @@ $(info Building for web...)
 endif
 CC := emcc
 AR := emar
-COMPILER_OPTS := -Os -Wno-enum-compare -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
+COMPILER_OPTS := -Wno-enum-compare -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2 -I raylib
 COMPILER_OPTS_RAYLIB := $(COMPILER_OPTS)
 PLAT_ID := web
 WEB := 1
@@ -34,7 +34,7 @@ PLAT_ID := win
 ifndef PROD
 COMPILER_OPTS := -Wno-enum-compare -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib -g -O0
 else
-COMPILER_OPTS := -Wno-enum-compare -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib
+COMPILER_OPTS := -Wno-enum-compare -lstdc++ -lopengl32 -lgdi32 -lwinmm -lraylib -I raylib -03
 endif
 COMPILER_OPTS_RAYLIB := $(COMPILER_OPTS) -D_GNU_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -I raylib/external/glfw/include
 DESKTOP := 1
@@ -103,7 +103,7 @@ $(OUTPUT)/libraylib.a: $(RAYLIB_OBJS)
 
 
 ifdef WEB
-RELEASE_CONTENT := $(DIST_OUT)/release.zip $(DIST_OUT)/index.html $(DIST_OUT)/index.js $(DIST_OUT)/index.wasm
+RELEASE_CONTENT := $(DIST_OUT)/release.zip $(DIST_OUT)/index.html $(DIST_OUT)/index.js $(DIST_OUT)/index.wasm $(DIST_OUT)/index.data
 endif
 ifdef DESKTOP
 RELEASE_CONTENT := $(DIST_OUT)/game.exe
