@@ -46,9 +46,9 @@ struct GameScene : Entity
         CardScene *card_scene = AllocateEntity<CardScene>();
         card_scene->spawner_ref = MakeRef<PentagramEntitySpawner>(penta_spawner);
 
-        PushChild(penta_spawner);
-        PushChild(game_world);
         PushChild(card_scene);
+        PushChild(game_world);
+        PushChild(penta_spawner);
     }
 
     void Update() override
