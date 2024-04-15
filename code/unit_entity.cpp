@@ -17,17 +17,24 @@ enum TargetingType
 };
 
 struct TesseractEntity : Entity {
+
+    u32 damage_sfx_counter;
+
     void OnRender() override {
         DrawSprite(0, 0, 40, 40, ORANGE, AppearanceType::TESSERACT);
     }
 
     void Damage(u32 damage) {
+        PlaySound(state->tesseract_damaged_sound[damage_sfx_counter]);
 
+        damage_sfx_counter = (damage_sfx_counter + 1) % 3;
     }
+
 };
 
 struct UnitEntity : Entity
 {
+
     UnitTeam team;
     UnitAttackType attack_type;
     TargetingType targeting_type;
@@ -57,6 +64,8 @@ struct UnitEntity : Entity
     u32 max_health = 10;
     float attack_speed = 1;
     float attack_cooldown;
+
+    bool is_fake;
 
     inline Color GetColor() const
     {
@@ -97,10 +106,9 @@ struct UnitEntity : Entity
 
     void OnEnable() override
     {
-        TraceLog(LOG_DEBUG, "OnEnbale: Alive units");
         Entity::OnEnable();
 
-        if (appearance >= UNIT_TYPE_COUNT || team != FRIENDLY) {
+        if (appearance >= UNIT_TYPE_COUNT || team != FRIENDLY || is_fake) {
             return;
         }
 
@@ -109,10 +117,9 @@ struct UnitEntity : Entity
 
     void OnDisable() override
     {
-        TraceLog(LOG_DEBUG, "OnDisable: Alive units");
         Entity::OnDisable();
 
-        if (appearance >= UNIT_TYPE_COUNT || team != FRIENDLY) {
+        if (appearance >= UNIT_TYPE_COUNT || team != FRIENDLY || is_fake) {
             return;
         }
 

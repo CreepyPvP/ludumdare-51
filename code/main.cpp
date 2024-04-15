@@ -71,6 +71,8 @@ struct GameState
     u32 alive_units[UNIT_TYPE_COUNT];
     Music unit_music[UNIT_TYPE_COUNT];
     Sound unit_summoned_sound[UNIT_TYPE_COUNT];
+
+    Sound tesseract_damaged_sound[3];
 };
 
 GameState *state;
@@ -147,9 +149,9 @@ void load_game_audio(GameState *state)
     Music melee_music = LoadMusicStream("assets/Melee_summoned_music.wav");
 
     state->unit_music[LIGHT] = LoadMusicStream("assets/Melee_summoned_music.wav");
-    // state->unit_music[ARCHER];
+    state->unit_music[ARCHER] = LoadMusicStream("assets/Range_summoned_music.wav");
     state->unit_music[TANK] = LoadMusicStream("assets/Tank_summoned_music.wav");
-    // state->unit_music[MEDIC];
+    state->unit_music[MEDIC] = LoadMusicStream("assets/Medic_summoned_music.wav");
 
     state->unit_summoned_sound[LIGHT] = LoadSound("assets/melee_summon.wav");
     // state->unit_summoned_sound[ARCHER] = LoadSound("assets/melee_summon.wav");
@@ -162,6 +164,10 @@ void load_game_audio(GameState *state)
         }
         PlayMusicStream(state->unit_music[i]);
     }
+
+    state->tesseract_damaged_sound[0] = LoadSound("assets/tesseract_damage_1.wav");
+    state->tesseract_damaged_sound[1] = LoadSound("assets/tesseract_damage_2.wav");
+    state->tesseract_damaged_sound[2] = LoadSound("assets/tesseract_damage_3.wav");
 }
 
 i32 main(void)
@@ -174,6 +180,7 @@ i32 main(void)
     state = create_game_state(memory, memory_size);
 
     Entity *root = AllocateEntity<Entity>();
+    root->OnEnable();
     DevelopmentScene *development_scene = AllocateEntity<DevelopmentScene>();
 
     root->PushChild(development_scene);

@@ -11,6 +11,7 @@ struct UnitTestRenderScene : Entity
         TraceLog(LOG_INFO, "Started Unit Test Render Scene");
 
         entity = AllocateEntity<UnitEntity>();
+        entity->is_fake = true;
         PushChild(entity);
         entity->local_position = {400, 225};
     }

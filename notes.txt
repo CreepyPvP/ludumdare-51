@@ -2,5 +2,7 @@ npx http-server -o ./
 
 TODO:
 
+Render methode vs Unit entity
+
 Unit types / flags
 Debug Ui

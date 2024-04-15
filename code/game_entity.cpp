@@ -83,9 +83,9 @@ struct DevelopmentScene : Entity
     void Update() override
     {
         Entity::Update();
-        RegisterScene<UnitManagementTestScene>(KEY_F1);
-        RegisterScene<UnitTestRenderScene>(KEY_F2);
-        RegisterScene<CardScene>(KEY_F3);
+        RegisterScene<UnitManagementTestScene>(KEY_ONE);
+        RegisterScene<UnitTestRenderScene>(KEY_TWO);
+        RegisterScene<CardScene>(KEY_THREE);
     }
 };
 
