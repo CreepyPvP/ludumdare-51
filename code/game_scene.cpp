@@ -181,9 +181,9 @@ struct GameScene : Entity
                  RED);
 
         int wave_w = MeasureText("Wave ", 40);
-        DrawText("Wave ", state->screen_width - wave_w, 2, 40, WHITE);
-        const char *wave_counter = TextFormat("%d", wave_id + 1);
-        DrawText(wave_counter, state->screen_width - wave_w  - MeasureText(wave_counter, 40), 2, 40,
+        DrawText("Wave ", state->screen_width / 2 - wave_w / 2, 2, 40, WHITE);
+        const char *wave_counter = TextFormat("%d", wave_id);
+        DrawText(wave_counter, state->screen_width / 2 + wave_w / 2  , 2, 40,
                  RED);
 
 
