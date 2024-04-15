@@ -5,20 +5,56 @@
 
 #define CARD_FOLLOW_SPEED 1000.0f
 
+struct CardScene : Entity {
+    EntityRef <PentagramEntitySpawner> spawner_ref{};
+    EntityRef <Entity> shop_ref{};
+    bool shop_active;
 
-struct CardTargetEntity : Entity
-{
+    void OnEnable() override;
 
-    void OnRender() override
-    {
+    void AutoLayout();
+
+    void OpenShop();
+
+    void CloseShop();
+
+
+    void Update() override {
+        Entity::Update();
+    }
+
+
+    void Render() override {
+        // DON'T RENDER CHILDREN
+    }
+
+    void AddCard(UnitData unit_data);
+
+    void RenderGUI() override {
+        Entity::Render();
+        Entity::RenderGUI();
+    }
+
+    bool Summon(Vector3 position, UnitData &data);
+
+};
+
+
+struct CardTargetEntity : Entity {
+
+    void OnRender() override {
         DrawSprite(0, 0, 40 * 3, 40 * 3, {230, 41, 55, 80}, AppearanceType::PENTAGRAM, 0);
         DrawLineEx({0, 0}, {-local_position.x + CARD_WIDTH_H - 15, -local_position.y - CARD_HEIGHT_H - 2}, 4, WHITE);
         DrawLineEx({0, 0}, {-local_position.x - CARD_WIDTH_H + 15, -local_position.y - CARD_HEIGHT_H - 2}, 4, WHITE);
     }
 };
 
-struct CardEntity : Entity
-{
+enum ShopType {
+    ShopType_Summon,
+    ShopType_Modification,
+};
+
+struct SummonCardEntity : Entity {
 
     bool is_dragged = false;
     bool is_hovering = false;
@@ -33,23 +69,21 @@ struct CardEntity : Entity
 
     Sound start_hover_sfx;
     Sound place_sfx;
-    EntityRef<UnitEntity> preview_unit_ref{};
-    EntityRef<CardTargetEntity> target_entity_ref{};
-    EntityRef<PentagramEntitySpawner> spawner_ref{};
+    EntityRef <UnitEntity> preview_unit_ref{};
+    EntityRef <CardTargetEntity> target_entity_ref{};
+    EntityRef <CardScene> card_scene_ref{};
 
     Vector3 start_position{};
 
     Vector3 relative_offset{};
     Vector3 hover_size{1.2, 1.2, 1};
 
-    void OnCreate() override
-    {
+    void OnCreate() override {
         start_hover_sfx = LoadSound("assets/cards_place_down_1.wav");
         place_sfx = LoadSound("assets/cards_place_down_2.wav");
     }
 
-    void OnEnable() override
-    {
+    void OnEnable() override {
         Entity::OnEnable();
 
         local_position = {state->screen_width + (float) CARD_WIDTH_H + 5, -CARD_HEIGHT_H - 5};
@@ -68,26 +102,22 @@ struct CardEntity : Entity
         target_entity_ref = MakeRef<CardTargetEntity>(target);
     }
 
-    void OnDestroy() override
-    {
+    void OnDestroy() override {
         Entity::OnDestroy();
         UnloadSound(start_hover_sfx);
         UnloadSound(place_sfx);
     }
 
-    void HandleSizing()
-    {
+    void HandleSizing() {
         local_scale = Vector3MoveTowards(local_scale, is_hovering ? hover_size : Vector3{1, 1, 1}, GetFrameTime());
     }
 
-    Rectangle GetShape()
-    {
+    Rectangle GetShape() {
         return {local_position.x - CARD_WIDTH_H, local_position.y - CARD_HEIGHT_H, CARD_WIDTH,
                 CARD_HEIGHT};
     }
 
-    void HoverUpdate()
-    {
+    void HoverUpdate() {
         if (CheckCollisionPointRec(GetMousePosition(), GetShape())) {
             if (!is_hovering) {
                 OnStartHover();
@@ -99,8 +129,7 @@ struct CardEntity : Entity
         }
     }
 
-    void Update() override
-    {
+    void Update() override {
         Entity::Update();
 
         if (is_on_cooldown) {
@@ -130,19 +159,19 @@ struct CardEntity : Entity
         Drag();
     }
 
-    void Select()
-    {
+    void Select() {
         state->click_handled = true;
         relative_offset = Vector3Subtract(local_position, {GetMousePosition().x, GetMousePosition().y, 0});
         is_dragged = true;
     }
 
-    void Release()
-    {
+    void Release() {
         if (is_aiming) {
-            spawner_ref->Summon({GetMousePosition().x, GetMousePosition().y}, unitData);
-            is_on_cooldown = true;
-            cooldown = max_cooldown;
+            bool success = card_scene_ref->Summon({GetMousePosition().x, GetMousePosition().y}, unitData);
+            if (success) {
+                is_on_cooldown = true;
+                cooldown = max_cooldown;
+            }
             PlaySound(place_sfx);
         }
 
@@ -150,13 +179,11 @@ struct CardEntity : Entity
         is_dragged = false;
     }
 
-    void NoDrag()
-    {
+    void NoDrag() {
         local_position = Vector3MoveTowards(local_position, start_position, GetFrameTime() * CARD_FOLLOW_SPEED);
     }
 
-    void Drag()
-    {
+    void Drag() {
         Vector2 mouse_screen_pos = GetMousePosition();
         Vector3 new_pos = {mouse_screen_pos.x, mouse_screen_pos.y, 0};
 
@@ -178,8 +205,7 @@ struct CardEntity : Entity
     }
 
 
-    void DoWorldDrag()
-    {
+    void DoWorldDrag() {
         local_position = Vector3MoveTowards(local_position, start_position, GetFrameTime() * CARD_FOLLOW_SPEED);
 
         target_entity_ref->hidden = false;
@@ -189,19 +215,16 @@ struct CardEntity : Entity
         target_entity_ref->local_position = Vector3Scale(delta, 1 / local_scale.x);
     }
 
-    void OnStartHover()
-    {
+    void OnStartHover() {
         is_hovering = true;
         PlaySound(start_hover_sfx);
     }
 
-    void OnStopHover()
-    {
+    void OnStopHover() {
         is_hovering = false;
     }
 
-    void OnRender() override
-    {
+    void OnRender() override {
         Rectangle card_shape = {-CARD_WIDTH_H, -CARD_HEIGHT_H, CARD_WIDTH, CARD_HEIGHT};
         DrawRectangleRounded(card_shape, 0.2f, 1, BLACK);
         DrawRectangleRoundedLines(card_shape, 0.2f, 1, 4, WHITE);
@@ -230,8 +253,7 @@ struct CardEntity : Entity
         DrawText(text, -text_width / 2, -CARD_WIDTH_H - 55, 30, WHITE);
     }
 
-    void OnLateRender()
-    {
+    void OnLateRender() {
         Rectangle card_shape = {-CARD_WIDTH_H, -CARD_HEIGHT_H, CARD_WIDTH, CARD_HEIGHT};
 
         if (is_locked || is_on_cooldown) {
@@ -246,84 +268,242 @@ struct CardEntity : Entity
     }
 };
 
+struct ShopCardEntity : Entity {
+    ShopType type;
 
-struct CardScene : Entity
-{
-    EntityRef<PentagramEntitySpawner> spawner_ref{};
+    UnitData new_unit_data;
+    EntityRef <CardScene> card_scene;
 
+    Vector3 start_position;
 
-    void OnEnable() override
-    {
-        Entity::OnEnable();
-
-        CardEntity *card = AllocateEntity<CardEntity>();
-        card->spawner_ref = spawner_ref;
-        card->unitData = {
-                UnitType_ARCHER,
-                5,
-        };
-        PushChild(card);
-
-        card = AllocateEntity<CardEntity>();
-        card->spawner_ref = spawner_ref;
-        card->unitData = {
-                UnitType_TANK,
-                5,
-        };
-        PushChild(card);
-        card = AllocateEntity<CardEntity>();
-        card->spawner_ref = spawner_ref;
-        card->unitData = {
-                UnitType_MEDIC,
-                5,
-        };
-        PushChild(card);
-
-        AutoLayout();
+    void OnCreate() override {
+        local_position = {(float) state->screen_width / 2, -CARD_HEIGHT_H - 20};
     }
 
-    void AutoLayout()
-    {
 
-        CardEntity *next_target = (CardEntity *) *child;
-        i32 index = 0;
-        float x_base = ((float) state->screen_width / 2) - ((float) child_count / 2.0f) * CARD_WIDTH;
-        while (next_target) {
-
-            next_target->start_position = {x_base + CARD_WIDTH * index, (float) state->screen_height + 40};
-
-            index++;
-            next_target = (CardEntity *) *next_target->next;
+    void ApplyToCard(UnitData &unit_data) {
+        if (type == ShopType_Summon) {
+            card_scene->AddCard(new_unit_data);
         }
+        DeleteEntity(*parent);
+        card_scene->AutoLayout();
+        card_scene->CloseShop();
+    }
+
+    void Update() override {
+        Entity::Update();
+        local_position = Vector3MoveTowards(local_position, start_position, GetFrameTime() * CARD_FOLLOW_SPEED);
+    }
+
+    void OnRender() override {
+        Rectangle card_shape = {-CARD_WIDTH_H, -CARD_HEIGHT_H, CARD_WIDTH, CARD_HEIGHT};
+        DrawRectangleRounded(card_shape, 0.2f, 1, BLACK);
+        DrawRectangleRoundedLines(card_shape, 0.2f, 1, 4, WHITE);
     }
 
 
-    void Update() override
-    {
-        Entity::Update();
+    Rectangle GetShape() {
+        return {local_position.x - CARD_WIDTH_H, local_position.y - CARD_HEIGHT_H, CARD_WIDTH,
+                CARD_HEIGHT};
+    }
+};
 
-        if (IsKeyPressed(KEY_F)) {
-            CardEntity *card = AllocateEntity<CardEntity>();
-            card->spawner_ref = spawner_ref;
-            card->unitData = {
-                    UnitType_ARCHER,
+struct ShopEntity : Entity {
+
+    bool close_timer_active;
+    float close_timer;
+    EntityRef <CardScene> card_scene;
+
+    void OnEnable() override {
+        Entity::OnEnable();
+        int free_card_spaces = 9 - card_scene->child_count; // Includes SHOP ENTITY so cards are -1
+        if (free_card_spaces < 0) free_card_spaces = 0;
+
+
+        if (free_card_spaces > 0) {
+            ShopCardEntity *card = AllocateEntity<ShopCardEntity>();
+            card->type = ShopType_Summon;
+            card->card_scene = card_scene;
+            card->new_unit_data = {
+                    UnitType_TANK,
                     5,
             };
             PushChild(card);
+
+            card = AllocateEntity<ShopCardEntity>();
+            card->type = ShopType_Summon;
+            card->card_scene = card_scene;
+            card->new_unit_data = {
+                    UnitType_LIGHT,
+                    5,
+            };
+
+            PushChild(card);
+            card = AllocateEntity<ShopCardEntity>();
+            card->type = ShopType_Summon;
+            card->card_scene = card_scene;
+            card->new_unit_data = {
+                    UnitType_ARCHER,
+                    5,
+            };
+
+            PushChild(card);
+
+            card = AllocateEntity<ShopCardEntity>();
+            card->type = ShopType_Summon;
+            card->card_scene = card_scene;
+            card->new_unit_data = {
+                    UnitType_MEDIC,
+                    3,
+            };
+
+            PushChild(card);
+
             AutoLayout();
+        }
+
+
+        if (child_count == 0) {
+            close_timer_active = true;
+            close_timer = 2.5;
         }
     }
 
 
-    void Render() override
-    {
-        // DON'T RENDER CHILDREN
+    void Update() override {
+        Entity::Update();
+
+        if (close_timer_active) {
+            close_timer -= GetFrameTime();
+            if (close_timer <= 0) {
+                card_scene->CloseShop();
+                DeleteEntity(this);
+            }
+        }
     }
 
-    void RenderGUI() override
-    {
-        Entity::Render();
-        Entity::RenderGUI();
+    void OnRender() override {
+
+        DrawRectangle(0, 0, state->screen_width, state->screen_height, {0, 0, 0, 180});
+
+        if (close_timer_active) {
+            const char *text = "No purchase available...";
+
+            int text_width = MeasureText(text, 50);
+
+            Rectangle text_rect = Rectangle{
+                    (float) state->screen_width / 2.0f - (float) text_width / 2.0f,
+                    (float) state->screen_height / 2.0f,
+                    (float) text_width, 50
+            };
+            Color text_color = RED;
+            DrawText(text, text_rect.x, text_rect.y, text_rect.height, text_color);
+        }
     }
 
+
+    void AutoLayout() {
+
+        ShopCardEntity *next_target = (ShopCardEntity *) *child;
+        i32 index = 0;
+        float x_base = ((float) state->screen_width / 2) - ((float) child_count / 2.0f) * (CARD_WIDTH + 15);
+        while (next_target) {
+
+            next_target->start_position = {x_base + (CARD_WIDTH + 15) * index, (float) state->screen_height / 2 - 60};
+
+            index++;
+            next_target = (ShopCardEntity *) *next_target->next;
+        }
+    }
+
+    bool InteractAt(Vector3 position, UnitData &data) {
+        ShopCardEntity *next_target = (ShopCardEntity *) *child;
+        while (next_target) {
+
+            if (CheckCollisionPointRec({position.x, position.y}, next_target->GetShape())) {
+                next_target->ApplyToCard(data);
+                return true;
+            }
+            next_target = (ShopCardEntity *) *next_target->next;
+        }
+
+        return false;
+    }
 };
+
+void CardScene::OnEnable() {
+    Entity::OnEnable();
+
+    SummonCardEntity *card = AllocateEntity<SummonCardEntity>();
+    card->card_scene_ref = MakeRef<CardScene>(this);
+    card->unitData = {
+            UnitType_ARCHER,
+            5,
+    };
+    PushChild(card);
+
+    card = AllocateEntity<SummonCardEntity>();
+    card->card_scene_ref = MakeRef<CardScene>(this);
+    card->unitData = {
+            UnitType_TANK,
+            5,
+    };
+    PushChild(card);
+    card = AllocateEntity<SummonCardEntity>();
+    card->card_scene_ref = MakeRef<CardScene>(this);
+    card->unitData = {
+            UnitType_MEDIC,
+            5,
+    };
+    PushChild(card);
+
+    AutoLayout();
+}
+
+void CardScene::AddCard(UnitData unit_data) {
+    SummonCardEntity *card = AllocateEntity<SummonCardEntity>();
+    card->card_scene_ref = MakeRef<CardScene>(this);
+    card->unitData = unit_data;
+    PushChild(card);
+    AutoLayout();
+}
+
+void CardScene::AutoLayout() {
+
+    SummonCardEntity *next_target = (SummonCardEntity *) *child;
+    i32 index = 0;
+    float x_base = ((float) state->screen_width / 2) - ((float) child_count / 2.0f) * CARD_WIDTH;
+    while (next_target) {
+
+        next_target->start_position = {x_base + CARD_WIDTH * index, (float) state->screen_height + 40};
+
+        index++;
+        next_target = (SummonCardEntity *) *next_target->next;
+    }
+}
+
+void CardScene::OpenShop() {
+    shop_active = true;
+    ShopEntity *shop = AllocateEntity<ShopEntity>();
+    shop->card_scene = MakeRef<CardScene>(this);
+
+    shop_ref = MakeRef<Entity>(shop);
+    PushChild(shop);
+}
+
+void CardScene::CloseShop() {
+    shop_active = false;
+}
+
+
+bool CardScene::Summon(Vector3 position, UnitData &data) {
+    if (shop_active) {
+        ShopEntity *shop = (ShopEntity *) *shop_ref;
+
+        shop->InteractAt(position, data);
+
+        return false;
+    }
+    spawner_ref->Summon(position, data);
+    return true;
+}
