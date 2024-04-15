@@ -16,16 +16,6 @@ enum TargetingType
     TEAM
 };
 
-enum AppearanceType
-{
-    LIGHT,
-    ARCHER,
-    TANK,
-    MEDIC,
-    PROJECTILE,
-    TESSERACT
-};
-
 struct TesseractEntity : Entity {
     void OnRender() override {
         DrawSprite(0, 0, 40, 40, ORANGE, AppearanceType::TESSERACT);
@@ -103,6 +93,30 @@ struct UnitEntity : Entity
 
         if (attack_cooldown <= 0) return;
         attack_cooldown -= GetFrameTime();
+    }
+
+    void OnEnable() override
+    {
+        TraceLog(LOG_DEBUG, "OnEnbale: Alive units");
+        Entity::OnEnable();
+
+        if (appearance >= UNIT_TYPE_COUNT || team != FRIENDLY) {
+            return;
+        }
+
+        state->alive_units[appearance]++;
+    }
+
+    void OnDisable() override
+    {
+        TraceLog(LOG_DEBUG, "OnDisable: Alive units");
+        Entity::OnDisable();
+
+        if (appearance >= UNIT_TYPE_COUNT || team != FRIENDLY) {
+            return;
+        }
+
+        state->alive_units[appearance]--;
     }
 
     void Damage(u32 damage_received)

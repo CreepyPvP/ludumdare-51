@@ -27,7 +27,7 @@ struct UnitManagementTestScene : Entity
         tesseract->local_position = {(float) state->screen_width / 2.0f, (float) state->screen_height / 2.0f};
 
 
-        u32 amount = 31;
+        u32 amount = 10;
         for (int i = 0; i < amount; ++i) {
             UnitEntity *unit = AllocateEntity<UnitEntity>();
 
