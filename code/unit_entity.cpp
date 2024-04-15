@@ -321,13 +321,33 @@ struct UnitManagementEntity : Entity
             }
 
             // Add push away from nearby friendly unit
-            if (Vector3LengthSqr(delta) > (protection_distance * protection_distance)) {
+            float dist = Vector3LengthSqr(delta);
+            if (dist > (protection_distance * protection_distance)) {
                 other_target = (UnitEntity *) *other_target->next;
                 continue;
             }
 
+            if (dist < 0.2f) {
+                switch (GetRandomValue(0, 3)) {
+                    case 0:
+                        delta = Vector3{1, 0, 0};
+                        break;
+                    case 1:
+                        delta = Vector3{0, 1, 0};
+                        break;
+                    case 2:
+                        delta = Vector3{-1, 0, 0};
+                        break;
+                    case3:
+                        delta = Vector3{0, -1, 0};
+                        break;
+                }
+            }
+
             close_dx += delta.x;
             close_dy += delta.y;
+
+
 
 
             other_target = (UnitEntity *) *other_target->next;
