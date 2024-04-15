@@ -114,6 +114,7 @@ void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, AppearanceType
 #include "entity.cpp"
 #include "unit_entity.cpp"
 #include "unit_test_render_scene.cpp"
+#include "start_scene.cpp"
 #include "card_scene.cpp"
 #include "game_entity.cpp"
 #include "arena.cpp"
@@ -185,7 +186,6 @@ i32 main(void)
     Entity *root = AllocateEntity<Entity>();
     root->OnEnable();
     DevelopmentScene *development_scene = AllocateEntity<DevelopmentScene>();
-
     root->PushChild(development_scene);
 
     InitWindow(state->screen_width, state->screen_height, "Title...");

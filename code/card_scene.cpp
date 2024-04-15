@@ -13,7 +13,7 @@ struct CardTargetEntity : Entity
         // DrawLine(0, 0, -local_position.x, -local_position.y - CARD_HEIGHT_H, WHITE);
         DrawLineEx({0, 0}, {-local_position.x + CARD_WIDTH_H - 15, -local_position.y - CARD_HEIGHT_H - 2}, 4, WHITE);
         DrawLineEx({0, 0}, {-local_position.x - CARD_WIDTH_H + 15, -local_position.y - CARD_HEIGHT_H - 2}, 4, WHITE);
-        DrawSprite(0, 0, 40, 40, GREEN, AppearanceType::PENTAGRAM);
+        DrawSprite(0, 0, 40, 40, GREEN, AppearanceType::PENTAGRAM, 0);
     }
 };
 

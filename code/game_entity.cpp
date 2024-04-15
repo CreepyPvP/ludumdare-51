@@ -86,6 +86,7 @@ struct DevelopmentScene : Entity
         RegisterScene<UnitManagementTestScene>(KEY_ONE);
         RegisterScene<UnitTestRenderScene>(KEY_TWO);
         RegisterScene<CardScene>(KEY_THREE);
+        RegisterScene<StartScene>(KEY_FOUR);
     }
 };
 
