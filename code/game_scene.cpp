@@ -28,7 +28,8 @@ struct GameWorld : Entity
 
 struct GameScene : Entity
 {
-
+    EntityRef<LifecycleScene> lifecycle_ref;
+    EntityRef<GameWorld> game_world_ref;
 
     void OnCreate() override
     {
@@ -36,6 +37,7 @@ struct GameScene : Entity
         state->stats = {};
 
         GameWorld *game_world = AllocateEntity<GameWorld>();
+        game_world_ref = MakeRef<GameWorld>(game_world);
 
         PentagramEntitySpawner *penta_spawner = AllocateEntity<PentagramEntitySpawner>();
 
@@ -56,6 +58,10 @@ struct GameScene : Entity
     {
         Entity::Update();
         state->stats.match_duration += GetFrameTime();
+
+        if(game_world_ref->tesseract_ref->health == 0) {
+            lifecycle_ref->OpenStats();
+        }
     }
 
 

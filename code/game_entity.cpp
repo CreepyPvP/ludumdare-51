@@ -1,20 +1,4 @@
 
-
-struct TestEntity : Entity
-{
-    void Update() override
-    {
-        Entity::Update();
-        // Vector3 pos = GetWorldPosition();
-        // TraceLog(LOG_DEBUG, "Test Updated %f::%f::%f", pos.x, pos.y, pos.z);
-    }
-
-    void Render() override
-    {
-        Entity::Render();
-    }
-};
-
 struct UnitManagementTestScene : Entity
 {
 
@@ -87,7 +71,7 @@ struct DevelopmentScene : Entity
         RegisterScene<UnitManagementTestScene>(KEY_ONE);
         RegisterScene<UnitTestRenderScene>(KEY_TWO);
         RegisterScene<GameScene>(KEY_THREE);
-        RegisterScene<StartScene>(KEY_FOUR);
+        RegisterScene<LifecycleScene>(KEY_FOUR);
     }
 };
 

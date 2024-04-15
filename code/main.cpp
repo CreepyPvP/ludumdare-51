@@ -123,9 +123,8 @@ void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, AppearanceType
 #include "entity.cpp"
 #include "unit_entity.cpp"
 #include "unit_test_render_scene.cpp"
-#include "start_scene.cpp"
 #include "card_scene.cpp"
-#include "game_scene.cpp"
+#include "lifecycle_scene.cpp"
 #include "game_entity.cpp"
 #include "arena.cpp"
 
