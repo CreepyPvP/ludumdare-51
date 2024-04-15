@@ -23,15 +23,15 @@ struct UnitTestRenderScene : Entity
     {
         Entity::Update();
 
-        UnitEntity *unit = (UnitEntity *) *child;
-        if (checked && unit->team == HOSTILE)
-        {
-            unit->team = FRIENDLY;
-        }
-        else if (!checked && unit->team == FRIENDLY)
-        {
-            unit->team = UnitTeam::HOSTILE;
-        }
+        // UnitEntity *unit = (UnitEntity *) *child;
+        // if (checked && unit->team == HOSTILE)
+        // {
+        //     unit->team = FRIENDLY;
+        // }
+        // else if (!checked && unit->team == FRIENDLY)
+        // {
+        //     unit->team = UnitTeam::HOSTILE;
+        // }
     }
 
     void RenderGUI() override
@@ -44,7 +44,7 @@ struct UnitTestRenderScene : Entity
             GuiLock();
         }
 
-        GuiCheckBox((Rectangle){ 10, 20, 20, 20 }, "Unit friendly", &checked);
+        GuiCheckBox((Rectangle){ 10, 20, 20, 20 }, "Unit friendly", (bool*) &entity->team);
         GuiUnlock();
 
         child->local_scale = { 5, 5, 1 };
