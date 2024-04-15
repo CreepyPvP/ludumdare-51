@@ -49,6 +49,7 @@ struct Entity
     u32 id;
     u32 generation;
     u32 flags = 0;
+    bool hidden;
 
     Vector3 local_position;
     Vector3 local_rotation;
@@ -117,7 +118,9 @@ struct Entity
     {
         Entity *next_target = *child;
         while (next_target) {
-            next_target->RenderGUI();
+            if(!next_target->hidden) {
+                next_target->RenderGUI();
+            }
             next_target = *next_target->next;
         }
     }
@@ -133,7 +136,9 @@ struct Entity
         OnRender();
         Entity *next_target = *child;
         while (next_target) {
-            next_target->Render();
+            if(!next_target->hidden) {
+                next_target->Render();
+            }
             next_target = *next_target->next;
         }
 
