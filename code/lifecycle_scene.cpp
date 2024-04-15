@@ -94,7 +94,7 @@ struct StatsScene : Entity
         DrawText("Your core was destroyed", state->screen_width / 2-MeasureText("Your core was destroyed", 50) / 2, y_offset - 2 * spacing, 50, RED);
 
         DrawText("Duration: ", x_offset, y_offset + spacing * 0, 40, WHITE);
-        const char *duration_timer = TextFormat("%.2f", state->stats.match_duration);
+        const char *duration_timer = GetDurationString();
         DrawText(duration_timer, MeasureText("Duration: ", 40) + x_offset, y_offset + spacing * 0, 40, ORANGE);
 
         const char *kill_counter = TextFormat("%d", state->stats.enemies_killed);

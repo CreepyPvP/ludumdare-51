@@ -121,6 +121,17 @@ void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, AppearanceType
     EndShaderMode();
 }
 
+const char* GetDurationString()
+{
+    const char *duration_timer;
+    if (state->stats.match_duration <= 60.0) {
+        duration_timer = TextFormat("%.2f", state->stats.match_duration);
+    } else {
+        duration_timer = TextFormat("%d:%02d", (i32) (state->stats.match_duration / 60), (i32) state->stats.match_duration % 60);
+    }
+    return duration_timer;
+}
+
 #include "unit_data.cpp"
 #include "entity.cpp"
 #include "unit_entity.cpp"

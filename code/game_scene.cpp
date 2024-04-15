@@ -25,7 +25,7 @@ struct GameWorld : Entity
     }
 };
 
-void clear_entity(Entity *entity)
+void ClearEntity(Entity *entity)
 {
     Entity *child = *entity->child;
     while (child) {
@@ -94,8 +94,8 @@ struct GameScene : Entity
 
         if (time_until_next_wave < 4 && stall_for_shop_after_wave) {
             card_scene_ref->OpenShop();
-            clear_entity(*game_world_ref->unit_container_ref->child);
-            clear_entity(*penta_spawner->child);
+            ClearEntity(*game_world_ref->unit_container_ref);
+            ClearEntity(penta_spawner);
             stall_for_shop_after_wave = false;
         }
 
@@ -171,7 +171,7 @@ struct GameScene : Entity
     {
         Entity::RenderGUI();
         DrawText("Duration: ", 6, 2, 40, WHITE);
-        const char *duration_timer = TextFormat("%.2f", state->stats.match_duration);
+        const char *duration_timer = GetDurationString();
         DrawText(duration_timer, MeasureText("Duration: ", 40) + 6, 2, 40, ORANGE);
 
         int enemy_killed_text_w = MeasureText(" Enemies killed", 40);
