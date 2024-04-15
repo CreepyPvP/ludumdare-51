@@ -21,7 +21,7 @@ struct UnitManagementTestScene : Entity
     void OnCreate() override
     {
         Entity *unit_management = AllocateEntity<UnitManagementEntity>();
-        Entity *tesseract = AllocateEntity<Entity>();
+        TesseractEntity *tesseract = AllocateEntity<TesseractEntity>();
         Entity *projectile_container = AllocateEntity<Entity>();
 
         tesseract->local_position = {(float) state->screen_width / 2.0f, (float) state->screen_height / 2.0f};
