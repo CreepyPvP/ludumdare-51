@@ -78,6 +78,7 @@ struct GameState
     u32 max_units[UNIT_TYPE_COUNT];
     u32 alive_units[UNIT_TYPE_COUNT];
     Music unit_music[UNIT_TYPE_COUNT];
+    float unit_music_volume[UNIT_TYPE_COUNT];
     Music base_layer;
     Sound unit_summoned_sound[UNIT_TYPE_COUNT];
 
@@ -237,9 +238,12 @@ i32 main(void)
                 continue;
             }
 
-            float volume = fmin((float) state->alive_units[i] / (float) state->max_units[i], 1) * 0.5;
+            float target_volume = fmin((float) state->alive_units[i] / (float) state->max_units[i], 1) * 0.5;
+            float current_volume = state->unit_music_volume[i];
+            float faded_volume = (target_volume - current_volume) * 0.01 + current_volume;
+            state->unit_music_volume[i] = faded_volume;
             UpdateMusicStream(state->unit_music[i]);
-            SetMusicVolume(state->unit_music[i], volume);
+            SetMusicVolume(state->unit_music[i], faded_volume);
         }
 
         root->Update();
