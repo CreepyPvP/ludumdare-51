@@ -127,13 +127,13 @@ struct GameScene : Entity
 
                     u32 batch_size = 1;
                     float batch_random = halton(units_left_in_wave + wave_id + spawn_seed, 7);
-                    if (batch_random > 0.6) {
+                    if (batch_random > 0.7) {
                         batch_size = 2;
                     }
-                    if (wave_id > 3 && batch_random > 0.8) {
+                    if (wave_id > 3 && batch_random > 0.7) {
                         batch_size = 3;
                     }
-                    if (wave_id > 8 && batch_random > 0.7) {
+                    if (wave_id > 8 && batch_random > 0.5) {
                         batch_size = 4;
                     }
 
@@ -148,7 +148,7 @@ struct GameScene : Entity
 
                         time_until_next_wave = 20;
                         time_until_next_spawn = 0;
-                        units_left_in_wave = 10 + wave_id * 2;
+                        units_left_in_wave = 4 + wave_id * 3;
                         stall_for_shop_after_wave = wave_id % 3 == 0;
 
                         if (stall_for_shop_after_wave) {

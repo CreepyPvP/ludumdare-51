@@ -9,15 +9,6 @@ Look into game randomness. especially spawning patterns.
 
 
 
-Store front
-Thumbnail
-
-Turn units in movement direction (opt)
-
-Production build
-Upload to itchio
 Balance game a little bit
 
-Modification system
-
-
+Reupload all the final build
