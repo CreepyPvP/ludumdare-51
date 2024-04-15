@@ -25,6 +25,15 @@ struct GameWorld : Entity
     }
 };
 
+void clear_entity(Entity *entity)
+{
+    Entity *child = *entity->child;
+    while (child) {
+        Entity *tmp = child;
+        child = *child->next;
+        DeleteEntity(tmp);
+    }
+}
 
 struct GameScene : Entity
 {
@@ -83,30 +92,10 @@ struct GameScene : Entity
         float delta = GetFrameTime();
         state->stats.match_duration += delta;
 
-        const char *warning = "WAVE INCOMING";
-        i32 warning_size = 40;
-        i32 warning_width =  MeasureText(warning, warning_size);
-
-        if (time_until_next_wave <= 1.8 && time_until_next_wave >= 1.5) {
-            DrawText(warning, state->screen_width / 2 - warning_width / 2, 150, warning_size, RED);
-        }
-        if (time_until_next_wave <= 1.2 && time_until_next_wave >= 0.9) {
-            DrawText(warning, state->screen_width / 2 - warning_width / 2, 150, warning_size, RED);
-        }
-        if (time_until_next_wave <= 0.6 && time_until_next_wave >= 0.3) {
-            DrawText(warning, state->screen_width / 2 - warning_width / 2, 150, warning_size, RED);
-        }
-
         if (time_until_next_wave < 4 && stall_for_shop_after_wave) {
             card_scene_ref->OpenShop();
-
-            Entity *child = *game_world_ref->unit_container_ref->child;
-            while (child) {
-                Entity *tmp = child;
-                child = *child->next;
-                DeleteEntity(tmp);
-            }
-
+            clear_entity(*game_world_ref->unit_container_ref->child);
+            clear_entity(*penta_spawner->child);
             stall_for_shop_after_wave = false;
         }
 
@@ -155,13 +144,15 @@ struct GameScene : Entity
 
                     if (units_left_in_wave == 0) {
                         wave_id++;
+                        state->stats.wave_id = wave_id;
+
                         time_until_next_wave = 20;
                         time_until_next_spawn = 0;
                         units_left_in_wave = 10 + wave_id * 2;
                         stall_for_shop_after_wave = wave_id % 3 == 0;
 
                         if (stall_for_shop_after_wave) {
-                            time_until_next_wave = 40;
+                            time_until_next_wave = 30;
                         }
                     }
                 }
@@ -170,7 +161,7 @@ struct GameScene : Entity
             time_until_next_wave -= delta;
         }
 
-        if(game_world_ref->tesseract_ref->health == 0) {
+        if (game_world_ref->tesseract_ref->health == 0) {
             lifecycle_ref->OpenStats();
         }
     }
@@ -183,10 +174,31 @@ struct GameScene : Entity
         const char *duration_timer = TextFormat("%.2f", state->stats.match_duration);
         DrawText(duration_timer, MeasureText("Duration: ", 40) + 6, 2, 40, ORANGE);
 
-        int enemy_killed_text_w = MeasureText(" enemies killed", 40);
-        DrawText(" enemies killed", state->screen_width - enemy_killed_text_w - 6, 2, 40, WHITE);
+        int enemy_killed_text_w = MeasureText(" Enemies killed", 40);
+        DrawText(" Enemies killed", state->screen_width - enemy_killed_text_w - 6, 2, 40, WHITE);
         const char *kill_counter = TextFormat("%d", state->stats.enemies_killed);
         DrawText(kill_counter, state->screen_width - enemy_killed_text_w - 6 - MeasureText(kill_counter, 40), 2, 40,
                  RED);
+
+        int wave_w = MeasureText("Wave ", 40);
+        DrawText("Wave ", state->screen_width - wave_w, 2, 40, WHITE);
+        const char *wave_counter = TextFormat("%d", wave_id + 1);
+        DrawText(wave_counter, state->screen_width - wave_w  - MeasureText(wave_counter, 40), 2, 40,
+                 RED);
+
+
+        const char *warning = "WAVE INCOMING";
+        i32 warning_size = 40;
+        i32 warning_width =  MeasureText(warning, warning_size);
+
+        if (time_until_next_wave <= 1.8 && time_until_next_wave >= 1.5) {
+            DrawText(warning, state->screen_width / 2 - warning_width / 2, 150, warning_size, RED);
+        }
+        if (time_until_next_wave <= 1.2 && time_until_next_wave >= 0.9) {
+            DrawText(warning, state->screen_width / 2 - warning_width / 2, 150, warning_size, RED);
+        }
+        if (time_until_next_wave <= 0.6 && time_until_next_wave >= 0.3) {
+            DrawText(warning, state->screen_width / 2 - warning_width / 2, 150, warning_size, RED);
+        }
     }
 };

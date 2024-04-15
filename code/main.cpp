@@ -54,6 +54,7 @@ struct EntitySlot
 struct GameStats {
     float match_duration;
     u32 enemies_killed;
+    u32 wave_id;
 };
 
 struct GameState

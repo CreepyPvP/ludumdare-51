@@ -6,7 +6,17 @@ Discuss render function
 
 Look into game randomness. especially spawning patterns.
 
-Spawn different enemy types
-Larger group sizes
-Spawn pause
-Better round scaling
+
+
+
+Store front
+Thumbnail
+
+Turn units in movement direction (opt)
+
+Round indicator
+Balance game a little bit
+
+Modification system
+
+
