@@ -459,7 +459,7 @@ struct ShopEntity : Entity {
 
         ShopCardEntity *next_target = (ShopCardEntity *) *child;
         i32 index = 0;
-        float x_base = ((float) state->screen_width / 2) - ((float) child_count / 2.0f) * (CARD_WIDTH + 15);
+        float x_base = ((float) state->screen_width / 2) - ((float) child_count / 2.0f) * (CARD_WIDTH + 15)  + CARD_WIDTH_H;
         while (next_target) {
 
             next_target->start_position = {x_base + (CARD_WIDTH + 15) * index, (float) state->screen_height / 2 - 60};
@@ -510,7 +510,7 @@ void CardScene::AutoLayout() {
 
     SummonCardEntity *next_target = (SummonCardEntity *) *child;
     i32 index = 0;
-    float x_base = ((float) state->screen_width / 2) - ((float) child_count / 2.0f) * CARD_WIDTH;
+    float x_base = ((float) state->screen_width / 2) - ((float) child_count / 2.0f) * CARD_WIDTH + CARD_WIDTH_H;
     while (next_target) {
 
         next_target->start_position = {x_base + CARD_WIDTH * index, (float) state->screen_height + 40};
