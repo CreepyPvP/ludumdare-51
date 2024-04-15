@@ -34,12 +34,15 @@ struct GameScene : Entity
     float time_until_next_spawn;
     float time_until_next_wave;
 
+    bool stall_for_shop_after_wave;
+
     u32 wave_id = 0;
 
     PentagramEntitySpawner *penta_spawner;
 
     EntityRef<LifecycleScene> lifecycle_ref;
     EntityRef<GameWorld> game_world_ref;
+    EntityRef<CardScene> card_scene_ref;
 
     void OnCreate() override
     {
@@ -55,6 +58,7 @@ struct GameScene : Entity
         penta_spawner->tesseract_ref = game_world->tesseract_ref;
 
         CardScene *card_scene = AllocateEntity<CardScene>();
+        card_scene_ref = MakeRef<CardScene>(card_scene);
         card_scene->spawner_ref = MakeRef<PentagramEntitySpawner>(penta_spawner);
 
         units_left_in_wave = 4;
@@ -72,6 +76,10 @@ struct GameScene : Entity
     {
         Entity::Update();
 
+        if (card_scene_ref->shop_active) {
+            return;
+        }
+
         float delta = GetFrameTime();
         state->stats.match_duration += delta;
 
@@ -87,6 +95,19 @@ struct GameScene : Entity
         }
         if (time_until_next_wave <= 0.6 && time_until_next_wave >= 0.3) {
             DrawText(warning, state->screen_width / 2 - warning_width / 2, 150, warning_size, RED);
+        }
+
+        if (time_until_next_wave < 4 && stall_for_shop_after_wave) {
+            card_scene_ref->OpenShop();
+
+            Entity *child = *game_world_ref->unit_container_ref->child;
+            while (child) {
+                Entity *tmp = child;
+                child = *child->next;
+                DeleteEntity(tmp);
+            }
+
+            stall_for_shop_after_wave = false;
         }
 
         if (time_until_next_wave <= 0) {
@@ -137,6 +158,11 @@ struct GameScene : Entity
                         time_until_next_wave = 20;
                         time_until_next_spawn = 0;
                         units_left_in_wave = 10 + wave_id * 2;
+                        stall_for_shop_after_wave = wave_id % 3 == 0;
+
+                        if (stall_for_shop_after_wave) {
+                            time_until_next_wave = 40;
+                        }
                     }
                 }
             }
