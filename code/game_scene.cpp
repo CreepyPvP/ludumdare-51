@@ -171,12 +171,7 @@ struct GameScene : Entity
     {
         Entity::RenderGUI();
         DrawText("Duration: ", 6, 2, 40, WHITE);
-        const char *duration_timer;
-        if (state->stats.match_duration <= 60.0) {
-            duration_timer = TextFormat("%.2f", state->stats.match_duration);
-        } else {
-            duration_timer = TextFormat("%d:%02d", (i32) (state->stats.match_duration / 60), (i32) state->stats.match_duration % 60);
-        }
+        const char *duration_timer = GetDurationString();
         DrawText(duration_timer, MeasureText("Duration: ", 40) + 6, 2, 40, ORANGE);
 
         int enemy_killed_text_w = MeasureText(" Enemies killed", 40);
