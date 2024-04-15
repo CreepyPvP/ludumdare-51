@@ -20,7 +20,7 @@ struct EntityRef
             return NULL;
         }
 
-        return (T*) (state->entity_slots + id);
+        return (T *) (state->entity_slots + id);
     }
 
     T *operator->()
@@ -29,13 +29,13 @@ struct EntityRef
             return NULL;
         }
 
-        return (T*) (state->entity_slots + id);
+        return (T *) (state->entity_slots + id);
     }
 
 };
 
 template<typename T>
-T* AllocateEntity();
+T *AllocateEntity();
 
 template<typename T>
 void DeleteEntity(T *entity);
@@ -70,11 +70,11 @@ struct Entity
     {
 
         return MatrixMultiply(
-            MatrixTranslate(local_position.x, local_position.y, local_position.z),
-            MatrixMultiply(
-                MatrixRotateXYZ(local_rotation),
-                MatrixScale(local_scale.x, local_scale.y, local_scale.z)
-            )
+                MatrixTranslate(local_position.x, local_position.y, local_position.z),
+                MatrixMultiply(
+                        MatrixRotateXYZ(local_rotation),
+                        MatrixScale(local_scale.x, local_scale.y, local_scale.z)
+                )
         );
     }
 
@@ -97,7 +97,9 @@ struct Entity
         flags = flags | EntityStateFlag::ACTIVE;
         Entity *next_target = *child;
         while (next_target) {
-            next_target->OnEnable();
+            if (!(next_target->flags & EntityStateFlag::ACTIVE)) {
+                next_target->OnEnable();
+            }
             next_target = *next_target->next;
         }
     }
@@ -110,6 +112,7 @@ struct Entity
             next_target = *next_target->next;
         }
     }
+
     virtual void RenderGUI()
     {
         Entity *next_target = *child;
@@ -123,9 +126,9 @@ struct Entity
     {
         rlPushMatrix();
         rlTranslatef(local_position.x, local_position.y, local_position.z);
-        rlRotatef(local_rotation.x,1, 0,0);
-        rlRotatef(local_rotation.y,0, 1,0);
-        rlRotatef(local_rotation.z,0, 0,1);
+        rlRotatef(local_rotation.x, 1, 0, 0);
+        rlRotatef(local_rotation.y, 0, 1, 0);
+        rlRotatef(local_rotation.z, 0, 0, 1);
         rlScalef(local_scale.x, local_scale.y, local_scale.z);
         OnRender();
         Entity *next_target = *child;
@@ -179,8 +182,8 @@ struct Entity
 
         // Activate new child if required and self active
         if (new_child->flags & EntityStateFlag::ACTIVE) return;
-        if (flags & ~EntityStateFlag::ACTIVE) return;
-        new_child->OnEnable();
+        if (flags & EntityStateFlag::ACTIVE) new_child->OnEnable();
+
     }
 
     void RemoveChild(Entity *child_ref)
@@ -219,7 +222,7 @@ struct Entity
             parent->RemoveChild(this);
         }
 
-        if(new_parent) {
+        if (new_parent) {
             new_parent->PushChild(this);
         } else {
             parent = {};
@@ -241,11 +244,11 @@ EntityRef<T> MakeRef(Entity *target)
         return {};
     }
 
-    return { target->id, target->generation };
+    return {target->id, target->generation};
 };
 
 template<typename T>
-T* AllocateEntity()
+T *AllocateEntity()
 {
     if (sizeof(T) > sizeof(EntitySlot)) {
         TraceLog(LOG_ERROR, "Sizeof Entity [%u] exceeds Sizeof EntitySlot [%u]\n", sizeof(T), sizeof(EntitySlot));
@@ -257,7 +260,7 @@ T* AllocateEntity()
     state->free_entity_count--;
     u32 id = state->free_entities[state->free_entity_count];
 
-    T *entity = new ((void*) &state->entity_slots[id]) T;
+    T *entity = new((void *) &state->entity_slots[id]) T;
     *entity = {};
 
     entity->id = id;
@@ -270,7 +273,7 @@ T* AllocateEntity()
 template<typename T>
 void DeleteEntity(T *entity)
 {
-    if(entity->flags & EntityStateFlag::TO_BE_DESTROYED) {
+    if (entity->flags & EntityStateFlag::TO_BE_DESTROYED) {
         return;
     };
 

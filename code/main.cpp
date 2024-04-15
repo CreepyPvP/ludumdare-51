@@ -50,6 +50,8 @@ struct GameState
 
     i32 screen_width;
     i32 screen_height;
+
+    bool click_handled;
 };
 
 GameState *state;
@@ -100,6 +102,7 @@ static GameState *create_game_state(void *memory, u64 memory_size)
     GameState *state = PushStruct(&pre.arena, GameState);
     *state = pre;
 
+    state->click_handled = false;
     state->screen_width = 1600;
     state->screen_height = 900;
     state->entity_cap = 100;
@@ -152,6 +155,7 @@ i32 main(void)
 
     while (!WindowShouldClose()) {
         seconds += GetFrameTime();
+        state->click_handled = false;
 
         SetShaderValue(state->neon_shader, seconds_loc, &seconds, SHADER_UNIFORM_FLOAT);
 
