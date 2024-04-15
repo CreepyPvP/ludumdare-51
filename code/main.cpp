@@ -48,7 +48,7 @@ enum AppearanceType
 
 struct EntitySlot
 {
-    char buffer[256];
+    char buffer[300];
 };
 
 struct GameStats {

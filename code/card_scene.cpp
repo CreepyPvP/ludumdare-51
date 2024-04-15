@@ -256,7 +256,6 @@ struct CardScene : Entity
         Entity::OnEnable();
 
         CardEntity *card = AllocateEntity<CardEntity>();
-        card->start_position = {((float) state->screen_width / 2) + CARD_WIDTH - 15, (float) state->screen_height + 40};
         card->spawner_ref = spawner_ref;
         card->unitData = {
                 UnitType_ARCHER,
@@ -265,7 +264,6 @@ struct CardScene : Entity
         PushChild(card);
 
         card = AllocateEntity<CardEntity>();
-        card->start_position = {((float) state->screen_width / 2), (float) state->screen_height + 40};
         card->spawner_ref = spawner_ref;
         card->unitData = {
                 UnitType_TANK,
@@ -273,13 +271,44 @@ struct CardScene : Entity
         };
         PushChild(card);
         card = AllocateEntity<CardEntity>();
-        card->start_position = {((float) state->screen_width / 2) - CARD_WIDTH + 15, (float) state->screen_height + 40};
         card->spawner_ref = spawner_ref;
         card->unitData = {
                 UnitType_MEDIC,
                 5,
         };
         PushChild(card);
+
+        AutoLayout();
+    }
+
+    void AutoLayout() {
+
+        CardEntity *next_target = (CardEntity *) *child;
+        i32 index = 0;
+        float x_base = ((float) state->screen_width / 2) - ((float) child_count / 2.0f) * CARD_WIDTH;
+        while (next_target) {
+
+            next_target->start_position = { x_base + CARD_WIDTH * index, (float) state->screen_height + 40};
+
+            index++;
+            next_target = (CardEntity *) *next_target->next;
+        }
+    }
+
+
+    void Update() override {
+        Entity::Update();
+
+        if(IsKeyPressed(KEY_F)) {
+            CardEntity *card = AllocateEntity<CardEntity>();
+            card->spawner_ref = spawner_ref;
+            card->unitData = {
+                    UnitType_ARCHER,
+                    5,
+            };
+            PushChild(card);
+            AutoLayout();
+        }
     }
 
 
