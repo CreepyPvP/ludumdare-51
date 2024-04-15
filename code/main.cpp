@@ -30,6 +30,7 @@ typedef float f32;
 typedef double f64;
 
 #include "arena.h"
+#include "game_math.cpp"
 
 enum AppearanceType
 {

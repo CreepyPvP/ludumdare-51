@@ -42,6 +42,12 @@ struct GameScene : Entity
         penta_spawner->unit_container_ref = game_world->unit_container_ref;
         penta_spawner->tesseract_ref = game_world->tesseract_ref;
 
+        for (u32 i = 0; i < 10; ++i) {
+            float x = halton(i, 2) * state->screen_width;
+            float y = halton(i, 3) * state->screen_height;
+
+            penta_spawner->Summon(Vector3 { x, y, 0 }, { UnitType_LIGHT, 1, true });
+        }
 
         CardScene *card_scene = AllocateEntity<CardScene>();
         card_scene->spawner_ref = MakeRef<PentagramEntitySpawner>(penta_spawner);

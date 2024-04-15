@@ -430,7 +430,7 @@ void ConfigureHostile(UnitEntity *unit, TesseractEntity *tesseract)
 
     unit->enemy_detection_range = 100;
     unit->move_factor = 35;
-    unit->attack_merge_range = 5;
+    unit->attack_merge_range = 30;
 
     unit->protection_distance = 40;
 }
