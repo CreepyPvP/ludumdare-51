@@ -2,6 +2,10 @@ npx http-server -o ./
 
 TODO:
 
+Discuss render function
+
+Look into game randomness. especially spawning patterns.
+
 Spawn different enemy types
 Larger group sizes
 Spawn pause
