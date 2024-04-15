@@ -103,7 +103,7 @@ $(OUTPUT)/libraylib.a: $(RAYLIB_OBJS)
 
 
 ifdef WEB
-RELEASE_CONTENT := $(DIST_OUT)/release.zip $(DIST_OUT)/index.html $(DIST_OUT)/index.js $(DIST_OUT)/index.wasm $(DIST_OUT)/index.data
+RELEASE_CONTENT := $(DIST_OUT)/index.html $(DIST_OUT)/index.js $(DIST_OUT)/index.wasm $(DIST_OUT)/index.data
 endif
 ifdef DESKTOP
 RELEASE_CONTENT := $(DIST_OUT)/game.exe
