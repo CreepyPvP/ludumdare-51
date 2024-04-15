@@ -601,7 +601,7 @@ struct PentagramEntity : Entity
 
     void OnRender() override
     {
-        DrawSprite(0, 0, 40 * 3, 40 * 3, RED, PENTAGRAM, 0);
+        DrawSprite(0, 0, 40 * 3, 40 * 3, data.hostile ? RED : BLUE, PENTAGRAM, 0);
     }
 
 };

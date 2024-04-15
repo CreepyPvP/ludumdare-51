@@ -43,7 +43,7 @@ struct CardScene : Entity {
 struct CardTargetEntity : Entity {
 
     void OnRender() override {
-        DrawSprite(0, 0, 40 * 3, 40 * 3, {230, 41, 55, 80}, AppearanceType::PENTAGRAM, 0);
+        DrawSprite(0, 0, 40 * 3, 40 * 3, BLUE, AppearanceType::PENTAGRAM, 0);
         DrawLineEx({0, 0}, {-local_position.x + CARD_WIDTH_H - 15, -local_position.y - CARD_HEIGHT_H - 2}, 4, WHITE);
         DrawLineEx({0, 0}, {-local_position.x - CARD_WIDTH_H + 15, -local_position.y - CARD_HEIGHT_H - 2}, 4, WHITE);
     }
