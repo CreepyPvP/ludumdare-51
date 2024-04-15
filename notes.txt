@@ -14,9 +14,10 @@ Thumbnail
 
 Turn units in movement direction (opt)
 
-Round indicator
-Balance game a little bit
 Date formatting
+Production build
+Upload to itchio
+Balance game a little bit
 
 Modification system
 
