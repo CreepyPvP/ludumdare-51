@@ -10,6 +10,7 @@ varying vec2 uv;
 varying vec3 color;
 
 uniform float seconds;
+uniform float distortion_amp;
 uniform int entity_type;
 
 float circle(vec2 pos, vec2 center, float radius)
@@ -27,8 +28,8 @@ float line(vec2 pos, vec2 a, vec2 b, float r )
 
 vec2 distort_pos(vec2 pos)
 {
-    pos.x += cos(seconds * 10.0 + pos.x * 7.5 + pos.y * 3.0) * 0.04;
-    pos.y += sin(seconds * 10.0 + pos.y * 7.5 + pos.x * 3.0) * 0.04;
+    pos.x += cos(seconds * 10.0 + pos.x * 7.5 + pos.y * 3.0) * 0.04 * distortion_amp;
+    pos.y += sin(seconds * 10.0 + pos.y * 7.5 + pos.x * 3.0) * 0.04 * distortion_amp;
     return pos;
 }
 
@@ -115,7 +116,19 @@ void main()
 
     // pentagram, hail satan
     if (entity_type == 7) {
-        float a = 0.0;
+        float outline = circle(pos, vec2(0.0, 0.0), 0.5);
+
+        float a = line(pos, vec2(0.0, 0.5), vec2(-0.588 * 0.5, -0.809 * 0.5), 0.0);
+        float b = line(pos, vec2(0.0, 0.5), vec2(0.588 * 0.5, -0.809 * 0.5), 0.0);
+        float c = line(pos, vec2(0.951 * 0.5, 0.309 * 0.5), vec2(-0.951 * 0.5, 0.309 * 0.5), 0.0);
+        float e = line(pos, vec2(0.951 * 0.5, 0.309 * 0.5), vec2(-0.588 * 0.5, -0.809 * 0.5), 0.0);
+        float f = line(pos, vec2(-0.951 * 0.5, 0.309 * 0.5), vec2(0.588 * 0.5, -0.809 * 0.5), 0.0);
+
+        d = min(outline, a);
+        d = min(d, b);
+        d = min(d, c);
+        d = min(d, e);
+        d = min(d, f);
     }
 
     float thickness = 0.06;

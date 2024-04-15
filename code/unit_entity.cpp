@@ -21,7 +21,7 @@ struct TesseractEntity : Entity {
     u32 damage_sfx_counter;
 
     void OnRender() override {
-        DrawSprite(0, 0, 40, 40, ORANGE, AppearanceType::TESSERACT);
+        DrawSprite(0, 0, 40, 40, ORANGE, AppearanceType::TESSERACT, 0);
     }
 
     void Damage(u32 damage) {
@@ -88,7 +88,8 @@ struct UnitEntity : Entity
 
     void OnRender() override
     {
-        DrawSprite(0, 0, 40, 40, GetColor(), appearance);
+        float dist = team == HOSTILE ? 1 : 0;
+        DrawSprite(0, 0, 40, 40, GetColor(), appearance, dist);
     }
 
     void Update() override
@@ -183,7 +184,7 @@ struct ProjectileEntity : Entity
 
     void OnRender() override
     {
-        DrawSprite(0, 0, 10, 10, color, LIGHT);
+        DrawSprite(0, 0, 10, 10, color, LIGHT, 0);
     }
 
     void HitTarget()
@@ -468,7 +469,7 @@ struct PentagramEntity: Entity
 
     void OnRender() override
     {
-        DrawSprite(0, 0, 40, 40, WHITE, PENTAGRAM);
+        DrawSprite(0, 0, 40, 40, WHITE, PENTAGRAM, 0);
     }
 
 };

@@ -44,10 +44,13 @@ struct UnitTestRenderScene : Entity
         GuiCheckBox((Rectangle){ 10, 20, 20, 20 }, "Unit friendly", &checked);
         GuiUnlock();
 
+        child->local_scale = { 5, 5, 1 };
+
         if (GuiDropdownBox((Rectangle){ 10, 50, 125, 30 },
                            "LIGHT;ARCHER;TANK;MEDIC;PLACEHOLDER;PROJECTILE;TESSERACT;PENTAGRAM",
                            (i32*) &entity->appearance, dropdown_edit)) {
             dropdown_edit = !dropdown_edit;
         }
+
     }
 };

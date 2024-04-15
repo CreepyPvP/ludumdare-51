@@ -56,6 +56,7 @@ struct GameState
 
     Shader neon_shader;
     i32 entity_type_loc;
+    i32 distortion_amp_loc;
 
     u32 entity_cap;
     EntitySlot *entity_slots;
@@ -78,7 +79,7 @@ struct GameState
 
 GameState *state;
 
-void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, AppearanceType type)
+void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, AppearanceType type, float distortion_amp)
 {
 
     BeginShaderMode(state->neon_shader);
@@ -104,6 +105,7 @@ void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, AppearanceType
     rlSetTexture(0);
 
     SetShaderValue(state->neon_shader, state->entity_type_loc, &type, SHADER_UNIFORM_INT);
+    SetShaderValue(state->neon_shader, state->distortion_amp_loc, &distortion_amp, SHADER_UNIFORM_FLOAT);
     rlDrawRenderBatchActive();
 
     EndShaderMode();
@@ -203,6 +205,7 @@ i32 main(void)
 
     i32 seconds_loc = GetShaderLocation(state->neon_shader, "seconds");
     state->entity_type_loc = GetShaderLocation(state->neon_shader, "entity_type");
+    state->distortion_amp_loc = GetShaderLocation(state->neon_shader, "distortion_amp");
 
     f32 seconds = 0;
 
