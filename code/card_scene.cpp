@@ -367,7 +367,7 @@ struct ShopEntity : Entity {
             card->card_scene = card_scene;
             card->new_unit_data = {
                     UnitType_TANK,
-                    5,
+                    3,
             };
             PushChild(card);
 
@@ -385,7 +385,7 @@ struct ShopEntity : Entity {
             card->card_scene = card_scene;
             card->new_unit_data = {
                     UnitType_ARCHER,
-                    5,
+                    3,
             };
 
             PushChild(card);
@@ -395,7 +395,7 @@ struct ShopEntity : Entity {
             card->card_scene = card_scene;
             card->new_unit_data = {
                     UnitType_MEDIC,
-                    3,
+                    2,
             };
 
             PushChild(card);
@@ -439,6 +439,18 @@ struct ShopEntity : Entity {
             };
             Color text_color = RED;
             DrawText(text, text_rect.x, text_rect.y, text_rect.height, text_color);
+        } else {
+            const char *text = "Drag a unit onto a card to select it!";
+
+            int text_width = MeasureText(text, 30);
+
+            Rectangle text_rect = Rectangle{
+                    (float) state->screen_width / 2.0f - (float) text_width / 2.0f,
+                    6,
+                    (float) text_width, 30
+            };
+            Color text_color = ORANGE;
+            DrawText(text, text_rect.x, text_rect.y, text_rect.height, text_color);
         }
     }
 
@@ -478,23 +490,8 @@ void CardScene::OnEnable() {
     SummonCardEntity *card = AllocateEntity<SummonCardEntity>();
     card->card_scene_ref = MakeRef<CardScene>(this);
     card->unitData = {
-            UnitType_ARCHER,
-            5,
-    };
-    PushChild(card);
-
-    card = AllocateEntity<SummonCardEntity>();
-    card->card_scene_ref = MakeRef<CardScene>(this);
-    card->unitData = {
-            UnitType_TANK,
-            5,
-    };
-    PushChild(card);
-    card = AllocateEntity<SummonCardEntity>();
-    card->card_scene_ref = MakeRef<CardScene>(this);
-    card->unitData = {
-            UnitType_MEDIC,
-            5,
+            UnitType_LIGHT,
+            4,
     };
     PushChild(card);
 
