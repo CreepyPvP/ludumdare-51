@@ -64,28 +64,28 @@ struct UnitManagementTestScene : Entity
 
 struct DevelopmentScene : Entity
 {
-    void Update() override
+
+    template <typename T>
+    void RegisterScene(i32 key)
     {
-        Entity::Update();
-        if (IsKeyPressed(KEY_F1)) {
+        if (IsKeyPressed(key)) {
             TraceLog(LOG_INFO, "Swap to Unit Scene");
             Entity *old_child = *child;
             if (old_child) {
                 DeleteEntity(old_child);
             }
-            Entity *new_child = AllocateEntity<UnitManagementTestScene>();
+            Entity *new_child = AllocateEntity<T>();
 
             new_child->SetParent(this);
         }
-        if (IsKeyPressed(KEY_F2)) {
-            Entity *old_child = *child;
-            if (old_child) {
-                DeleteEntity(old_child);
-            }
-            Entity *new_child = AllocateEntity<UnitTestRenderScene>();
+    }
 
-            new_child->SetParent(this);
-        }
+    void Update() override
+    {
+        Entity::Update();
+        RegisterScene<UnitManagementTestScene>(KEY_F1);
+        RegisterScene<UnitTestRenderScene>(KEY_F2);
+        RegisterScene<CardScene>(KEY_F3);
     }
 };
 
