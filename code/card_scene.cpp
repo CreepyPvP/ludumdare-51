@@ -446,7 +446,7 @@ struct ShopEntity : Entity {
 
             Rectangle text_rect = Rectangle{
                     (float) state->screen_width / 2.0f - (float) text_width / 2.0f,
-                    6,
+                    120,
                     (float) text_width, 30
             };
             Color text_color = ORANGE;
