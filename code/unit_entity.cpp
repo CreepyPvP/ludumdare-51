@@ -152,6 +152,15 @@ struct UnitEntity : Entity
     {
         return (float) health / (float) max_health;
     }
+
+    void OnDestroy() override
+    {
+        if (!is_fake && team == UnitTeam::HOSTILE) {
+            state->stats.enemies_killed += 1;
+        }
+        Entity::OnDestroy();
+
+    }
 };
 
 struct ProjectileEntity : Entity
@@ -519,12 +528,14 @@ struct PentagramEntity : Entity
 
     bool finished;
 
-    void OnEnable() override {
+    void OnEnable() override
+    {
         Entity::OnEnable();
         sound = LoadSoundAlias(state->unit_summoned_sound[data.type]);
     }
 
-    void OnDisable() override {
+    void OnDisable() override
+    {
         UnloadSoundAlias(sound);
     }
 

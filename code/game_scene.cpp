@@ -1,10 +1,12 @@
-struct GameWorld: Entity {
+struct GameWorld : Entity
+{
 
     EntityRef<Entity> unit_container_ref;
     EntityRef<Entity> projectile_container_ref;
     EntityRef<TesseractEntity> tesseract_ref;
 
-    void OnCreate() override {
+    void OnCreate() override
+    {
 
         Entity *unit_management = AllocateEntity<UnitManagementEntity>();
         TesseractEntity *tesseract = AllocateEntity<TesseractEntity>();
@@ -23,25 +25,50 @@ struct GameWorld: Entity {
 };
 
 
+struct GameScene : Entity
+{
 
-struct GameScene: Entity {
 
-    void OnCreate() override {
+    void OnCreate() override
+    {
 
-        GameWorld* game_world = AllocateEntity<GameWorld>();
+        state->stats = {};
 
-        PentagramEntitySpawner* penta_spawner = AllocateEntity<PentagramEntitySpawner>();
+        GameWorld *game_world = AllocateEntity<GameWorld>();
+
+        PentagramEntitySpawner *penta_spawner = AllocateEntity<PentagramEntitySpawner>();
 
         penta_spawner->projectile_container_ref = game_world->projectile_container_ref;
         penta_spawner->unit_container_ref = game_world->unit_container_ref;
         penta_spawner->tesseract_ref = game_world->tesseract_ref;
 
 
-        CardScene* card_scene = AllocateEntity<CardScene>();
+        CardScene *card_scene = AllocateEntity<CardScene>();
         card_scene->spawner_ref = MakeRef<PentagramEntitySpawner>(penta_spawner);
 
         PushChild(penta_spawner);
         PushChild(game_world);
         PushChild(card_scene);
+    }
+
+    void Update() override
+    {
+        Entity::Update();
+        state->stats.match_duration += GetFrameTime();
+    }
+
+
+    void RenderGUI() override
+    {
+        Entity::RenderGUI();
+        DrawText("Duration: ", 6, 2, 40, WHITE);
+        const char *duration_timer = TextFormat("%.2f", state->stats.match_duration);
+        DrawText(duration_timer, MeasureText("Duration: ", 40) + 6, 2, 40, ORANGE);
+
+        int enemy_killed_text_w = MeasureText(" enemies killed", 40);
+        DrawText(" enemies killed", state->screen_width - enemy_killed_text_w - 6, 2, 40, WHITE);
+        const char *kill_counter = TextFormat("%d", state->stats.enemies_killed);
+        DrawText(kill_counter, state->screen_width - enemy_killed_text_w - 6 - MeasureText(kill_counter, 40), 2, 40,
+                 RED);
     }
 };

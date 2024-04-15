@@ -50,6 +50,11 @@ struct EntitySlot
     char buffer[256];
 };
 
+struct GameStats {
+    float match_duration;
+    u32 enemies_killed;
+};
+
 struct GameState
 {
     Arena arena;
@@ -66,8 +71,9 @@ struct GameState
 
     i32 screen_width;
     i32 screen_height;
-
     bool click_handled;
+
+    GameStats stats;
 
     u32 max_units[UNIT_TYPE_COUNT];
     u32 alive_units[UNIT_TYPE_COUNT];
