@@ -1,20 +1,4 @@
 
-
-struct TestEntity : Entity
-{
-    void Update() override
-    {
-        Entity::Update();
-        // Vector3 pos = GetWorldPosition();
-        // TraceLog(LOG_DEBUG, "Test Updated %f::%f::%f", pos.x, pos.y, pos.z);
-    }
-
-    void Render() override
-    {
-        Entity::Render();
-    }
-};
-
 struct UnitManagementTestScene : Entity
 {
 
@@ -24,6 +8,7 @@ struct UnitManagementTestScene : Entity
         TesseractEntity *tesseract = AllocateEntity<TesseractEntity>();
         Entity *projectile_container = AllocateEntity<Entity>();
 
+        tesseract->health = 20;
         tesseract->local_position = {(float) state->screen_width / 2.0f, (float) state->screen_height / 2.0f};
 
 
@@ -38,9 +23,9 @@ struct UnitManagementTestScene : Entity
                 ConfigureHostile(unit, tesseract);
             }
 
-            if(i % 5 == 0) {
+            if (i % 5 == 0) {
                 ConfigureLight(unit);
-            } else if(i % 2 == 0) {
+            } else if (i % 2 == 0) {
                 ConfigureArcher(unit);
             } else if (i % 3 == 0) {
                 ConfigureMedic(unit);
@@ -65,7 +50,7 @@ struct UnitManagementTestScene : Entity
 struct DevelopmentScene : Entity
 {
 
-    template <typename T>
+    template<typename T>
     void RegisterScene(i32 key)
     {
         if (IsKeyPressed(key)) {
@@ -86,7 +71,7 @@ struct DevelopmentScene : Entity
         RegisterScene<UnitManagementTestScene>(KEY_ONE);
         RegisterScene<UnitTestRenderScene>(KEY_TWO);
         RegisterScene<GameScene>(KEY_THREE);
-        RegisterScene<StartScene>(KEY_FOUR);
+        RegisterScene<LifecycleScene>(KEY_FOUR);
     }
 };
 

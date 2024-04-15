@@ -124,9 +124,8 @@ void DrawSprite(f32 x, f32 y, f32 width, f32 height, Color color, AppearanceType
 #include "entity.cpp"
 #include "unit_entity.cpp"
 #include "unit_test_render_scene.cpp"
-#include "start_scene.cpp"
 #include "card_scene.cpp"
-#include "game_scene.cpp"
+#include "lifecycle_scene.cpp"
 #include "game_entity.cpp"
 #include "arena.cpp"
 
@@ -141,7 +140,7 @@ static GameState* create_game_state(void *memory, u64 memory_size)
     state->click_handled = false;
     state->screen_width = 1600;
     state->screen_height = 900;
-    state->entity_cap = 100;
+    state->entity_cap = 5000;
     state->entity_slots = PushArray(&state->arena, EntitySlot, state->entity_cap);
     state->entity_generations = PushArray(&state->arena, u32, state->entity_cap);
     state->free_entity_count = state->entity_cap;
@@ -193,7 +192,7 @@ i32 main(void)
 {
     SetTraceLogLevel(LOG_DEBUG);
 
-    u64 memory_size = Megabytes(1);
+    u64 memory_size = Megabytes(4);
     void *memory = malloc(memory_size);
 
     state = create_game_state(memory, memory_size);

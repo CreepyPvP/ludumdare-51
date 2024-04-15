@@ -20,10 +20,14 @@ struct TesseractEntity : Entity
 {
 
     u32 damage_sfx_counter;
+    u32 health;
 
     void OnRender() override
     {
-        DrawSprite(0, 0, 40, 40, ORANGE, AppearanceType::TESSERACT, 0);
+        DrawSprite(0, 0, 40 * 3, 40 * 3, ORANGE, AppearanceType::TESSERACT, 0);
+        const char *text = TextFormat("%d", health);
+        DrawText(text, -MeasureText(text, 20) / 2, -10, 20, RED);
+
     }
 
     void Damage(u32 damage)
@@ -31,6 +35,12 @@ struct TesseractEntity : Entity
         PlaySound(state->tesseract_damaged_sound[damage_sfx_counter]);
 
         damage_sfx_counter = (damage_sfx_counter + 1) % 3;
+
+        if (health <= damage) {
+            health = 0;
+            return;
+        }
+        health -= damage;
     }
 
 };
@@ -348,8 +358,6 @@ struct UnitManagementEntity : Entity
             close_dy += delta.y;
 
 
-
-
             other_target = (UnitEntity *) *other_target->next;
         }
 
@@ -379,7 +387,7 @@ struct UnitManagementEntity : Entity
 
             if (dist < (attack_merge_range * attack_merge_range)) {
                 TraceLog(LOG_INFO, "Merge into core");
-                current_target->overall_target->Damage(current_target->damage);
+                current_target->overall_target->Damage(1);
                 DeleteEntity(current_target);
                 return;
             }
@@ -450,7 +458,7 @@ void ConfigureHostile(UnitEntity *unit, TesseractEntity *tesseract)
 
     unit->enemy_detection_range = 100;
     unit->move_factor = 35;
-    unit->attack_merge_range = 30;
+    unit->attack_merge_range = 50;
 
     unit->protection_distance = 40;
 }
