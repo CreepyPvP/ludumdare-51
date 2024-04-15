@@ -28,6 +28,17 @@ struct GameWorld : Entity
 
 struct GameScene : Entity
 {
+
+    // TODO: Set this one correctly
+    u32 spawn_seed;
+    u32 units_left_in_wave;
+    float time_until_next_spawn;
+    float time_until_next_wave;
+
+    u32 wave_id = 0;
+
+    PentagramEntitySpawner *penta_spawner;
+
     EntityRef<LifecycleScene> lifecycle_ref;
     EntityRef<GameWorld> game_world_ref;
 
@@ -39,15 +50,17 @@ struct GameScene : Entity
         GameWorld *game_world = AllocateEntity<GameWorld>();
         game_world_ref = MakeRef<GameWorld>(game_world);
 
-        PentagramEntitySpawner *penta_spawner = AllocateEntity<PentagramEntitySpawner>();
-
+        penta_spawner = AllocateEntity<PentagramEntitySpawner>();
         penta_spawner->projectile_container_ref = game_world->projectile_container_ref;
         penta_spawner->unit_container_ref = game_world->unit_container_ref;
         penta_spawner->tesseract_ref = game_world->tesseract_ref;
 
-
         CardScene *card_scene = AllocateEntity<CardScene>();
         card_scene->spawner_ref = MakeRef<PentagramEntitySpawner>(penta_spawner);
+
+        units_left_in_wave = 10 + wave_id;
+        time_until_next_spawn = 0;
+        time_until_next_wave = 3;
 
         PushChild(card_scene);
         PushChild(game_world);
@@ -57,7 +70,55 @@ struct GameScene : Entity
     void Update() override
     {
         Entity::Update();
-        state->stats.match_duration += GetFrameTime();
+
+        float delta = GetFrameTime();
+        state->stats.match_duration += delta;
+
+        const char *warning = "WAVE INCOMING";
+        i32 warning_size = 40;
+        i32 warning_width =  MeasureText(warning, warning_size);
+
+        if (time_until_next_wave <= 1.8 && time_until_next_wave >= 1.5) {
+            DrawText(warning, state->screen_width / 2 - warning_width / 2, 150, warning_size, RED);
+        }
+        if (time_until_next_wave <= 1.2 && time_until_next_wave >= 0.9) {
+            DrawText(warning, state->screen_width / 2 - warning_width / 2, 150, warning_size, RED);
+        }
+        if (time_until_next_wave <= 0.6 && time_until_next_wave >= 0.3) {
+            DrawText(warning, state->screen_width / 2 - warning_width / 2, 150, warning_size, RED);
+        }
+
+        if (time_until_next_wave <= 0) {
+            if (units_left_in_wave > 0) {
+                time_until_next_spawn -= delta;
+                if (time_until_next_spawn <= 0) {
+                    float x = 0, y = 0, dist;
+
+                    do {
+                        x = halton(units_left_in_wave + spawn_seed + x * 100 + y * 200, 2);
+                        y = halton(units_left_in_wave + spawn_seed + x * 200 + y * 100, 3);
+                        dist = (x - 0.5) * (x - 0.5) + (y - 0.5) * (y - 0.5);
+                    } while (dist < 0.2 * 0.2);
+
+                    x *= state->screen_width;
+                    y *= state->screen_height;
+
+                    penta_spawner->Summon(Vector3 { x, y, 0 }, { UnitType_LIGHT, 1, true });
+
+                    time_until_next_spawn = 0.25 * halton(units_left_in_wave + spawn_seed, 5) + 0.2;
+                    units_left_in_wave--;
+
+                    if (units_left_in_wave == 0) {
+                        wave_id++;
+                        time_until_next_wave = 20;
+                        time_until_next_spawn = 0;
+                        units_left_in_wave = 10 + wave_id * 3;
+                    }
+                }
+            }
+        } else {
+            time_until_next_wave -= delta;
+        }
 
         if(game_world_ref->tesseract_ref->health == 0) {
             lifecycle_ref->OpenStats();

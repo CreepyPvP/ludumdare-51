@@ -387,7 +387,7 @@ struct UnitManagementEntity : Entity
 
             if (dist < (attack_merge_range * attack_merge_range)) {
                 TraceLog(LOG_INFO, "Merge into core");
-                current_target->overall_target->Damage(current_target->damage);
+                current_target->overall_target->Damage(1);
                 DeleteEntity(current_target);
                 return;
             }
@@ -458,7 +458,7 @@ void ConfigureHostile(UnitEntity *unit, TesseractEntity *tesseract)
 
     unit->enemy_detection_range = 100;
     unit->move_factor = 35;
-    unit->attack_merge_range = 5;
+    unit->attack_merge_range = 50;
 
     unit->protection_distance = 40;
 }

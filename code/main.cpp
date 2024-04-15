@@ -30,6 +30,7 @@ typedef float f32;
 typedef double f64;
 
 #include "arena.h"
+#include "game_math.cpp"
 
 enum AppearanceType
 {
@@ -139,7 +140,7 @@ static GameState* create_game_state(void *memory, u64 memory_size)
     state->click_handled = false;
     state->screen_width = 1600;
     state->screen_height = 900;
-    state->entity_cap = 100;
+    state->entity_cap = 5000;
     state->entity_slots = PushArray(&state->arena, EntitySlot, state->entity_cap);
     state->entity_generations = PushArray(&state->arena, u32, state->entity_cap);
     state->free_entity_count = state->entity_cap;
@@ -150,7 +151,7 @@ static GameState* create_game_state(void *memory, u64 memory_size)
     }
 
     for (u32 i = 0; i < UNIT_TYPE_COUNT; ++i) {
-        state->max_units[i] = 5;
+        state->max_units[i] = 15;
     }
 
     return state;
@@ -191,7 +192,7 @@ i32 main(void)
 {
     SetTraceLogLevel(LOG_DEBUG);
 
-    u64 memory_size = Megabytes(1);
+    u64 memory_size = Megabytes(4);
     void *memory = malloc(memory_size);
 
     state = create_game_state(memory, memory_size);
